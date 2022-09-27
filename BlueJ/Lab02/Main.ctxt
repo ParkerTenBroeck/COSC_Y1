@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=Main
+comment1.params=args
+comment1.target=void\ main(java.lang.String[])
+comment2.params=millis
+comment2.target=void\ crankySleep(long)
+comment3.params=image\ rootFrame\ keys
+comment3.target=void\ runVm(java.awt.image.BufferedImage,\ javax.swing.JFrame,\ Main.KeyRememberer)
+comment4.params=main\ root_component\ sleep\ rand
+comment4.target=void\ recursive_removal_fun(javax.swing.JFrame,\ javax.swing.JComponent,\ int,\ java.util.Random)
+numComments=5

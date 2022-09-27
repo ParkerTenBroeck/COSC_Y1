@@ -1,0 +1,20 @@
+#BlueJ class context
+comment0.target=VirtualMachine
+comment0.text=\n\ A\ simple\ implementation\ of\ a\ slightly\ modified\ MIPSr3\ instruction\ set\ in\ java\n\ (the\ main\ difference\ is\ lack\ of\ FPU,\ 64bit\ mode,\ paging,\ Branch\ delay\ slot\ and\ memory\ delay\ slot)\n\n\ Information\ about\ the\ ISA\ is\ found\ here\ https\://s3-eu-west-1.amazonaws.com/downloads-mips/documents/MD00086-2B-MIPS32BIS-AFP-05.04.pdf\n\ And\ here\ https\://s3-eu-west-1.amazonaws.com/downloads-mips/documents/MD00565-2B-MIPS32-QRC-01.01.pdf\n
+comment1.params=
+comment1.target=void\ reset()
+comment2.params=
+comment2.target=void\ run()
+comment3.params=address\ data
+comment3.target=void\ setWord(int,\ int)
+comment4.params=address\ data
+comment4.target=void\ setHalf(int,\ short)
+comment5.params=address\ data
+comment5.target=void\ setByte(int,\ byte)
+comment6.params=address
+comment6.target=int\ getWord(int)
+comment7.params=address
+comment7.target=short\ getHalf(int)
+comment8.params=address
+comment8.target=byte\ getByte(int)
+numComments=9

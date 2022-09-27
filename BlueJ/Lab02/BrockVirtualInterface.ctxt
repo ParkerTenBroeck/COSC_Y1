@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.target=BrockVirtualInterface
+comment1.params=image\ rootFrame\ keys
+comment1.target=BrockVirtualInterface(java.awt.image.BufferedImage,\ javax.swing.JFrame,\ Main.KeyRememberer)
+comment2.params=obj
+comment2.target=int\ insert_object(java.lang.Object)
+comment3.params=id
+comment3.target=java.lang.Object\ remove_object(int)
+comment4.params=id
+comment4.target=java.lang.Object\ get_object(int)
+comment5.params=emu\ call_id
+comment5.target=void\ system_call(VirtualMachine,\ int)
+comment6.params=emu
+comment6.target=void\ processDrawCall(VirtualMachine)
+comment7.params=iter
+comment7.target=int\ unsignedByteFromIter(java.util.Iterator)
+comment8.params=iter
+comment8.target=int\ shotFromByteIter(java.util.Iterator)
+comment9.params=emu\ call_id
+comment9.target=void\ breakpoint(VirtualMachine,\ int)
+numComments=10

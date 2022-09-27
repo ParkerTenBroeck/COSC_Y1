@@ -1,0 +1,24 @@
+[package]
+name = "binary"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+interface = { path = "../interface" }
+num-bigint = { version = "*", default-features = false}
+libm = "*"
+spin = "*"
+wee_alloc = { version = "*", features = ["static_array_backend"]}
+
+[dependencies.num-traits]
+version = "0.2"
+default-features = false
+
+[build-dependencies]
+png = {version = "*"}
+#rustc-fami = {path = "../../RustcFami"}
+
+[profile.release]
+debug=true

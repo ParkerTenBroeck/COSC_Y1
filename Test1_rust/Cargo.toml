@@ -1,0 +1,14 @@
+[workspace]
+
+members = [
+	"binary",
+	"interface",
+]
+
+[profile.release]
+panic="abort"
+debug = true
+lto = true
+
+[profile.dev]
+panic="abort"
