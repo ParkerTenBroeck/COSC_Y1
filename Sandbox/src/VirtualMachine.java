@@ -1,3 +1,5 @@
+import java.util.Random;
+
 /**
  * A simple implementation of a slightly modified MIPSr3 instruction set in java
  * (the main difference is lack of FPU, 64bit mode, paging, Branch delay slot and memory delay slot)
@@ -610,9 +612,11 @@ public class VirtualMachine {
             }
         }catch(Exception e){
             System.err.println("Run time exception: " + e);
-            System.out.printf("0x%08X: 0x%08X%n", this.pc, this.memory[this.pc >> 2]);
+            try{
+                System.out.printf("0x%08X: 0x%08X%n", this.pc, this.memory[this.pc >> 2]);
+            }catch (Exception ignore){
+            }
             this.running = false;
-            throw e;
         }
     }
 

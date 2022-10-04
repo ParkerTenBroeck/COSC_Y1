@@ -1,18 +1,17 @@
 extern crate alloc;
 
-use core::mem::MaybeUninit;
-
+use alloc::boxed::Box;
 use alloc::format;
 use alloc::vec::Vec;
-use interface::screen;
-use interface::screen::DrawCall;
+use interface::screen::ScreeenPoint;
+use interface::screen::Screen;
 use interface::screen::ScreenCommand;
 use num_traits::Zero;
 
 use crate::asteroids::util::*;
 
 pub struct Game {
-    screen: DrawCall,
+    screen: Screen,
     frame: u32,
     ship: Ship,
     reset: bool,
@@ -63,7 +62,7 @@ impl Game {
         self.screen
             .push_command(ScreenCommand::SetColor([255, 255, 0, 255]));
         self.screen
-            .push_command(ScreenCommand::Text(str, 0, self.debug_str as i16 * 15));
+            .push_command(ScreenCommand::Text(str, (0i16, self.debug_str as i16 * 15).into()));
     }
 
     pub fn run_frame(&mut self) {
@@ -137,10 +136,10 @@ impl Game {
                 return false;
             }
 
-            self.screen.push_command(ScreenCommand::Pixel(
-                bullet.pos.x as i16,
-                bullet.pos.y as i16,
-            ));
+            let mut tmp = bullet.pos;
+            tmp.x -= bullet.vel.x * d_time;
+            tmp.y -= bullet.vel.y * d_time;
+            self.screen.push_command(ScreenCommand::Line(bullet.pos.into(), tmp.into()));
             bullet.life > 0.0
         });
 
@@ -149,33 +148,41 @@ impl Game {
         self.particles.retain_mut(|particle| {
             particle.pos.x += particle.vel.x * d_time;
             particle.pos.y += particle.vel.y * d_time;
-            particle.pos.fit_to_screen(&mut self.screen);
             particle.life -= d_time;
+            if let Some(c) = &particle.color_fn{
+                    self.screen
+                .push_command(ScreenCommand::SetColor(c(particle)));
+            }
             if let Some(ls) = particle.ls.as_mut() {
                 ls.0.x += particle.vel.x * d_time;
                 ls.0.y += particle.vel.y * d_time;
-                ls.0.fit_to_screen(&mut self.screen);
+                //ls.0.fit_to_screen(&mut self.screen);
                 ls.1 += ls.2 * d_time;
-                let x_c = (ls.0.x + particle.pos.x) / 2.0;
-                let y_c = (ls.0.y + particle.pos.y) / 2.0;
+                let mut center = Vector::new((ls.0.x + particle.pos.x) / 2.0, (ls.0.y + particle.pos.y) / 2.0);
 
-                let p1 = Vector::new(ls.0.x - x_c, ls.0.y - y_c);
-                let p2 = Vector::new(particle.pos.x - x_c, particle.pos.y - y_c);
+                let p1 = Vector::new(ls.0.x - center.x, ls.0.y - center.y);
+                let p2 = Vector::new(particle.pos.x - center.x, particle.pos.y - center.y);
+
+                center.fit_to_screen(&mut self.screen);
 
                 let (sin, cos) = libm::sincosf(ls.1);
-                let t = calculate_screen_points([p1, p2], sin, cos, Vector::new(x_c, y_c));
+                let t = calculate_screen_points([p1, p2], sin, cos, center);
 
                 self.screen
-                    .push_command_with_wrap(ScreenCommand::Line(t[0].0, t[0].1, t[1].0, t[1].1));
+                    .push_command_with_wrap(ScreenCommand::Line(t[0], t[1]));
             } else {
+                particle.pos.fit_to_screen(&mut self.screen);
                 self.screen.push_command(ScreenCommand::Pixel(
-                    particle.pos.x as i16,
-                    particle.pos.y as i16,
+                    particle.pos.into()
                 ));
+            }
+            if particle.color_fn.is_some(){
+                self.screen
+            .push_command(ScreenCommand::SetColor([255, 255, 255, 255]));
+        
             }
             particle.life > 0.0
         });
-
         self.screen
             .push_command(ScreenCommand::SetColor([255, 255, 255, 255]));
         for asteroid in &mut self.asteroids {
@@ -184,19 +191,19 @@ impl Game {
             asteroid.pos.fit_to_screen(&mut self.screen);
             let x = asteroid.pos.x as i16;
             let y = asteroid.pos.y as i16;
-            let mut d_p = [(0, 0); 12];
+            let mut d_p = [ScreeenPoint::default(); 12];
             for (d_p, a_p) in d_p.iter_mut().zip(asteroid.points.iter()) {
-                d_p.0 = a_p.0 + x;
-                d_p.1 = a_p.1 + y;
+                d_p.x = a_p.0 + x;
+                d_p.y = a_p.1 + y;
             }
             if self.show_debug {
                 self.screen
                     .push_command(ScreenCommand::SetColor([0, 0, 255, 255]));
                 self.screen.push_command_with_wrap(ScreenCommand::Oval(
-                    x,
-                    y,
-                    asteroid.max_rad as i16,
-                    asteroid.max_rad as i16,
+                    (x,
+                    y,).into(),
+                    (asteroid.max_rad as i16,
+                    asteroid.max_rad as i16,).into()
                 ));
                 self.screen
                     .push_command(ScreenCommand::SetColor([255, 255, 255, 255]));
@@ -209,10 +216,9 @@ impl Game {
             self.screen
                 .push_command(ScreenCommand::SetColor([0, 0, 255, 255]));
             self.screen.push_command_with_wrap(ScreenCommand::Oval(
-                self.ship.pos.x as i16,
-                self.ship.pos.y as i16,
-                SHIP_MAX_RADIUS as i16,
-                SHIP_MAX_RADIUS as i16,
+                self.ship.pos.into(),
+                (SHIP_MAX_RADIUS as i16,
+                SHIP_MAX_RADIUS as i16).into()
             ));
         }
 
@@ -286,15 +292,15 @@ impl Game {
             .push_command(ScreenCommand::SetColor([255, 255, 255, 255]));
         
         let str = format!("score: {}", self.score);
-        self.screen.push_command(ScreenCommand::Text(&str, self.screen.get_width() / 2 - str.len() as i16 * 5 / 2, 10));
+        self.screen.push_command(ScreenCommand::Text(&str, (self.screen.get_width() / 2 - str.len() as i16 * 5 / 2, 10i16).into()));
 
 
         let str = format!("level: {}", self.level + 1);
-        self.screen.push_command(ScreenCommand::Text(&str, self.screen.get_width() / 2 - str.len() as i16 * 5 / 2, 25));
+        self.screen.push_command(ScreenCommand::Text(&str, (self.screen.get_width() / 2 - str.len() as i16 * 5 / 2, 25i16).into()));
 
 
         let str = format!("lives: {}", self.lives);
-        self.screen.push_command(ScreenCommand::Text(&str, self.screen.get_width() / 2 - str.len() as i16 * 5 / 2, 40));
+        self.screen.push_command(ScreenCommand::Text(&str, (self.screen.get_width() / 2 - str.len() as i16 * 5 / 2, 40i16).into()));
 
         if self.show_debug {
             self.draw_debug_str(&format!("particles: {:.2}", self.particles.len()));
@@ -314,7 +320,7 @@ impl Game {
         self.last_time = now;
 
         if !interface::sys::is_key_pressed('e') {
-            interface::sys::sleep_d_ms(25);
+            interface::sys::sleep_d_ms(16);
         }
     }
 
@@ -347,6 +353,7 @@ struct Ship {
     angle: f32,
     invincible: f32,
     cant_shoot: f32,
+    god: bool
 }
 
 enum ShipCollision {
@@ -413,6 +420,9 @@ impl Ship {
         if interface::sys::is_key_pressed('d') {
             ship.angle += 4.0 * d_time;
         }
+        if interface::sys::is_key_pressed('i') {
+            ship.god = !ship.god;
+        }
 
         let (sin, cos) = libm::sincosf(ship.angle);
 
@@ -425,10 +435,7 @@ impl Ship {
         if interface::sys::is_key_pressed(' ') {
             if ship.cant_shoot == 0.0 {
                 let bullet = Bullet {
-                    pos: Vector {
-                        x: d_points[0].0 as f32,
-                        y: d_points[0].1 as f32,
-                    },
+                    pos:  d_points[0].into(),
                     vel: Vector {
                         x: cos * 350.0 + ship.vel.x,
                         y: sin * 350.0 + ship.vel.y,
@@ -436,7 +443,11 @@ impl Ship {
                     can_hurt_player: false,
                     life: 1.1,
                 };
-                ship.cant_shoot = 1.0;
+                if ship.god{
+                    //ship.cant_shoot = 0.003;
+                }else{
+                    ship.cant_shoot = 0.4;
+                }
                 bullets.push(bullet);
             } else {
                 ship.cant_shoot -= d_time;
@@ -455,14 +466,33 @@ impl Ship {
             if should_draw {
                 screen.push_command(ScreenCommand::SetColor([255, 255, 0, 255]));
                 let mut p1 = calculate_screen_points(SHIP_FIRE_INNER, sin, cos, ship.pos);
-                p1[1].0 += interface::sys::rand_range(-1, 1) as i16;
-                p1[1].1 += interface::sys::rand_range(-1, 1) as i16;
+                p1[1].x += interface::sys::rand_range(-1, 1) as i16;
+                p1[1].y += interface::sys::rand_range(-1, 1) as i16;
                 screen.push_command_with_wrap(ScreenCommand::PolygonLine(&p1));
 
                 screen.push_command(ScreenCommand::SetColor([255, 0, 0, 255]));
                 let mut p2 = calculate_screen_points(SHIP_FIRE_OUTER, sin, cos, ship.pos);
-                p2[1].0 += interface::sys::rand_range(-1, 1) as i16;
-                p2[1].1 += interface::sys::rand_range(-1, 1) as i16;
+                p2[1].x += interface::sys::rand_range(-1, 1) as i16;
+                p2[1].y += interface::sys::rand_range(-1, 1) as i16;
+                
+                for i in 0..(libm::ceilf(200.0 * d_time) as i32) {
+                    let mut particle = Particle::new_point(Vector::new(p1[1].x as f32, p1[1].y as f32));
+                    particle.pos.x += i as f32 * cos;
+                    particle.pos.y += i as f32 * sin;
+                    particle.vel.x /= 2.0;
+                    particle.vel.y /= 2.0;
+                    particle.life /= 6.0;
+                    let life = particle.life;
+                    particle.vel.x += ship.vel.x + 260.0 * -cos;
+                    particle.vel.y += ship.vel.y + 260.0 * -sin;
+                    particle.color_fn = Some(Box::new(move |particle|{
+                        let life = (particle.life / life * 255.0) as u8;
+                        [life,life,life,255]
+                    }));
+                    particles.push(particle);
+                    
+
+                }
                 screen.push_command_with_wrap(ScreenCommand::PolygonLine(&p2));
             }
         } else {
@@ -470,38 +500,59 @@ impl Ship {
             ship.acc.y = 0.0;
         }
 
-        let dfc = 0.128 * d_time;
-
-        //actual drag calculation
-        ship.acc.x -= dfc * ship.vel.x * ship.vel.x * if ship.vel.x < 0.0 { -1.0 } else { 1.0 };
-        ship.acc.y -= dfc * ship.vel.y * ship.vel.y * if ship.vel.y < 0.0 { -1.0 } else { 1.0 };
-
-        //idk what this is irl but it makes it feel better??
+           
         {
-            let fony_balony_drag_cof = 20.0 * d_time;
-            let full = libm::sqrtf(ship.vel.x * ship.vel.x + ship.vel.y * ship.vel.y);
-            if !full.is_zero() {
-                let abs_x = abs(ship.vel.x);
-                ship.vel.x -= ship.vel.x / full * fony_balony_drag_cof;
-                if abs(ship.vel.x) > abs_x {
-                    ship.vel.x = 0.0;
-                }
+            let dfc = 0.128 * 0.025;
 
-                let abs_y = abs(ship.vel.y);
-                ship.vel.y -= ship.vel.y / full * fony_balony_drag_cof;
-                if abs(ship.vel.y) > abs_y {
-                    ship.vel.y = 0.0;
+            let full_s = ship.vel.x * ship.vel.x + ship.vel.y * ship.vel.y;
+            let full = libm::sqrtf(full_s);
+
+            if !full.is_zero(){
+
+                let xp = ship.vel.x / full;
+                let yp = ship.vel.y / full;
+    
+                //actual drag calculation
+                let tmp_ad = dfc * full_s;
+                ship.acc.x -= xp * tmp_ad;
+                ship.acc.y -= yp * tmp_ad;
+    
+            }
+
+
+            //idk what this is irl but it makes it feel better??
+            {
+                let fony_balony_drag_cof = 20.0;
+                if !full.is_zero() {
+                    let abs_x = abs(ship.vel.x);
+
+                    if abs_x < 0.5 {
+                        ship.vel.x = 0.0;
+                    }else{
+                        ship.acc.x -= ship.vel.x / full * fony_balony_drag_cof;
+                    }
+
+                    let abs_y = abs(ship.vel.y);
+                    if abs_y < 0.5 {
+                        ship.vel.y = 0.0;
+                    }else{
+                        ship.acc.y -= ship.vel.y / full * fony_balony_drag_cof;
+                    }
                 }
             }
+
+
+            let half_d_time = d_time / 2.0;
+
+            ship.vel.x += ship.acc.x * half_d_time; // OoOOOOoO proper acceleration integration OOOooOooOOo
+            ship.vel.y += ship.acc.y * half_d_time;
+            ship.pos.x += ship.vel.x * d_time;
+            ship.pos.y += ship.vel.y * d_time;
+            ship.vel.x += ship.acc.x * half_d_time;
+            ship.vel.y += ship.acc.y * half_d_time;
         }
 
-        let half = d_time / 2.0;
-        ship.vel.x += ship.acc.x * half; // OoOOOOoO proper acceleration integration OOOooOooOOo
-        ship.vel.y += ship.acc.y * half;
-        ship.pos.x += ship.vel.x * d_time;
-        ship.pos.y += ship.vel.y * d_time;
-        ship.vel.x += ship.acc.x * half;
-        ship.vel.y += ship.acc.y * half;
+        //interface::println!("{:#?}", ship.acc);
 
         ship.pos.fit_to_screen(screen);
         ship.invincible -= d_time;
@@ -509,7 +560,7 @@ impl Ship {
             ship.invincible = 0.0;
         }
 
-        if !invincible {
+        if !invincible && !ship.god{
             let t = 'thing: {
                 for (i, asteroid) in asteroids.iter_mut().enumerate() {
                     let tmpx = asteroid.pos.x - ship.pos.x;
@@ -527,17 +578,17 @@ impl Ship {
                 ShipCollision::None
             };
             if !matches!(t, ShipCollision::None) {
-                let (mut l_x, mut l_y) = d_points[3];
-                for (x, y) in d_points {
+                let mut l_v = d_points[3];
+                for p in d_points {
                     let mut particle = Particle::new_line(
-                        Vector::new(x as f32, y as f32),
-                        Vector::new(l_x as f32, l_y as f32),
+                        Vector::new(p.x as f32, p.y as f32),
+                        Vector::new(l_v.x as f32, l_v.y as f32),
                     );
                     particle.vel.x += ship.vel.x;
                     particle.vel.y += ship.vel.y;
                     particles.push(particle);
-                    l_x = x;
-                    l_y = y;
+                    l_v.x = p.x;
+                    l_v.y = p.y;
                 }
             }
             return t;
@@ -546,7 +597,7 @@ impl Ship {
         ShipCollision::None
     }
 
-    pub fn after_death(&mut self, screen: &mut DrawCall) {
+    pub fn after_death(&mut self, screen: &mut Screen) {
         self.pos.x = screen.get_width() as f32 / 2.0;
         self.pos.y = screen.get_height() as f32 / 2.0;
         self.vel = Vector::new(0.0, 0.0);
@@ -616,9 +667,9 @@ struct Bullet {
 //------------------------------------------------------------------------------------------
 
 mod util {
-    use interface::screen::DrawCall;
+    use interface::screen::{Screen, ScreeenPoint};
 
-    #[derive(Default, Clone, Copy)]
+    #[derive(Debug, Default, Clone, Copy)]
     pub struct Vector {
         pub x: f32,
         pub y: f32,
@@ -630,19 +681,47 @@ mod util {
         }
     }
 
+    impl From<Vector> for ScreeenPoint{
+        fn from(vec: Vector) -> Self {
+            Self { x: vec.x as i16, y: vec.y as i16 }
+        }
+    }
+
+    impl From<ScreeenPoint> for Vector{
+        fn from(vec: ScreeenPoint) -> Self {
+            Self { x: vec.x as f32, y: vec.y as f32 }
+        }
+    }
+
+
     impl Vector {
-        pub fn fit_to_screen(&mut self, screen: &mut DrawCall) {
-            while self.x >= screen.get_width() as f32 {
+        pub fn fit_to_screen(&mut self, screen: &mut Screen) {
+            if self.x >= screen.get_width() as f32 {
                 self.x -= screen.get_width() as f32;
             }
-            while self.y >= screen.get_height() as f32 {
+            if self.x >= screen.get_width() as f32 {
+                self.x %= screen.get_width() as f32;
+            }
+
+            if self.y >= screen.get_height() as f32 {
                 self.y -= screen.get_height() as f32;
             }
-            while self.x < 0.0 {
+            if self.y >= screen.get_height() as f32 {
+                self.y %= screen.get_height() as f32;
+            }
+
+            if self.x < 0.0 {
                 self.x += screen.get_width() as f32;
             }
-            while self.y < 0.0 {
+            if self.x < 0.0 {
+                self.x %= screen.get_width() as f32;
+            }
+
+            if self.y < 0.0 {
                 self.y += screen.get_height() as f32;
+            }
+            if self.y < 0.0 {
+                self.y %= screen.get_height() as f32;
             }
         }
 
@@ -674,12 +753,12 @@ mod util {
         sin: f32,
         cos: f32,
         off: Vector,
-    ) -> [(i16, i16); T] {
-        let mut d_points: [(i16, i16); T] = [(0, 0); T];
+    ) -> [ScreeenPoint; T] {
+        let mut d_points: [ScreeenPoint; T] = [ScreeenPoint::default(); T];
         for (point, d_point) in points.iter().zip(d_points.iter_mut()) {
             let tmp = (point.x * cos + point.y * -sin + off.x) as i16;
-            d_point.1 = (point.x * sin + point.y * cos + off.y) as i16;
-            d_point.0 = tmp;
+            d_point.y = (point.x * sin + point.y * cos + off.y) as i16;
+            d_point.x = tmp;
         }
         d_points
     }
@@ -692,6 +771,7 @@ struct Particle {
     vel: Vector,
     ls: Option<(Vector, f32, f32)>,
     life: f32,
+    color_fn: Option<Box<dyn Fn(&Self) -> [u8; 4]>>
 }
 
 impl Particle {
@@ -701,6 +781,7 @@ impl Particle {
             vel: Vector::random_vel(10, 70),
             ls: None,
             life: interface::sys::rand_range(10, 25) as f32 / 10.0,
+            color_fn: None,
         }
     }
 

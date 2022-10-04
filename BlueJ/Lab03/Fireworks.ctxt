@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=Fireworks
+comment1.params=
+comment1.target=Fireworks()
+comment2.params=count
+comment2.target=void\ randomFireworks(int)
+comment3.params=x\ y\ radius\ color
+comment3.target=void\ firework(double,\ double,\ double,\ java.awt.Color)
+comment4.params=length
+comment4.target=void\ improvedStep(double)
+numComments=5

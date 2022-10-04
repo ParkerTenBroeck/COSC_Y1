@@ -12,11 +12,18 @@ extern crate libm;
 pub unsafe extern "C" fn fmod(f1: f64, f2: f64) -> f64 {
     libm::fmod(f1, f2)
 }
+#[no_mangle]
+/// # Safety
+///
+pub unsafe extern "C" fn fmodf(f1: f32, f2: f32) -> f32 {
+    libm::fmodf(f1, f2)
+}
 
 pub mod alloc;
 pub mod asteroids;
 pub mod panic_handler;
 pub mod util;
+pub mod asteroids2;
 
 use asteroids::Game;
 pub use interface::print;

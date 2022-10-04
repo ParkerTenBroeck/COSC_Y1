@@ -1,0 +1,7 @@
+#BlueJ class context
+comment0.target=RandomWalk
+comment1.params=
+comment1.target=RandomWalk()
+comment2.params=numSteps
+comment2.target=void\ randomWalk(int)
+numComments=3

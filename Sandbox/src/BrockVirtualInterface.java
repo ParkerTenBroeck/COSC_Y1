@@ -359,8 +359,7 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                             int y1 = shotFromByteIter(iter);
                             int x2 = shotFromByteIter(iter);
                             int y2 = shotFromByteIter(iter);
-                            g.drawPolyline(new int[]{x1,x2,x2}, new int[]{y1,y2,y2}, 3);
-
+                            g.drawLine(x1,y1,x2,y2);
                         }
                         break;
                     case 3:

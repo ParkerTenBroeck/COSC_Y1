@@ -4,33 +4,71 @@ use alloc::vec::Vec;
 
 use crate::sys::{syscall_0_2, syscall_2_0, SCREEN_WIDTH_HEIGHT, SEND_MAIN_SCREEN_DRAW_CALL};
 
-pub enum ScreenCommand<'a> {
-    SetColor([u8; 4]),
-    Pixel(i16, i16),
-    Line(i16, i16, i16, i16),
-    Clear,
-    Text(&'a str, i16, i16),
-    Rect(i16, i16, i16, i16),
-    FilledRect(i16, i16, i16, i16),
-    Polygon(&'a [(i16, i16)]),
-    FilledPolygon(&'a [(i16, i16)]),
-    PolygonLine(&'a [(i16, i16)]),
-    Oval(i16, i16, i16, i16),
+
+#[derive(Default, Clone, Copy)]
+pub struct ScreeenPoint{
+    pub x: i16,
+    pub y: i16,
 }
 
-pub struct DrawCall {
+pub type ScreenPos = ScreeenPoint;
+pub type ScreenVec = ScreeenPoint;
+
+
+impl<T: Into<i16> + Copy> From<[T; 2]> for ScreeenPoint{
+    fn from(v: [T; 2]) -> Self {
+        ScreeenPoint { x: v[0].into(), y: v[1].into() }
+    }
+}
+
+impl<X: Into<i16>, Y: Into<i16>> From<(X, Y)> for ScreeenPoint{
+    fn from((x, y): (X, Y)) -> Self {
+        ScreeenPoint { x: x.into(), y: y.into() }
+    }
+}
+
+impl From<ScreeenPoint> for (i16, i16){
+    fn from(v: ScreeenPoint) -> Self {
+        (v.x, v.y)
+    }
+}
+
+impl From<ScreeenPoint> for [i16; 2]{
+    fn from(v: ScreeenPoint) -> Self {
+        [v.x, v.y]
+    }
+}
+
+
+
+
+pub enum ScreenCommand<'a> {
+    SetColor([u8; 4]),
+    Pixel(ScreenPos),
+    Line(ScreenPos, ScreenPos),
+    Clear,
+    Text(&'a str, ScreenPos),
+    Rect(ScreenPos, ScreenVec),
+    FilledRect(ScreenPos, ScreenVec),
+    Polygon(&'a [ScreenPos]),
+    FilledPolygon(&'a [ScreenPos]),
+    PolygonLine(&'a [ScreenPos]),
+    Oval(ScreenPos, ScreenVec),
+}
+
+pub struct Screen {
     width: i16,
     height: i16,
     call_data: Vec<u8>,
 }
 
-impl Default for DrawCall {
+impl Default for Screen {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl DrawCall {
+impl Screen {
     pub fn new() -> Self {
         let (width, height) = get_screen_width_height();
         Self {
@@ -41,79 +79,89 @@ impl DrawCall {
     }
 }
 
-impl DrawCall {
+impl Screen {
     pub fn push_command(&mut self, command: ScreenCommand) {
         match command {
-            ScreenCommand::Pixel(x, y) => {
+            ScreenCommand::Pixel(p) => {
                 self.call_data.push(1);
-                self.push_data(&x.to_be_bytes());
-                self.push_data(&y.to_be_bytes());
+                self.push_data(&p.x.to_be_bytes());
+                self.push_data(&p.y.to_be_bytes());
             }
-            ScreenCommand::Line(x1, y1, x2, y2) => {
+            
+            ScreenCommand::Line(p1,p2) => {
                 self.call_data.push(2);
-                self.push_data(&x1.to_be_bytes());
-                self.push_data(&y1.to_be_bytes());
-                self.push_data(&x2.to_be_bytes());
-                self.push_data(&y2.to_be_bytes());
+                self.push_data(&p1.x.to_be_bytes());
+                self.push_data(&p1.y.to_be_bytes());
+                self.push_data(&p2.x.to_be_bytes());
+                self.push_data(&p2.y.to_be_bytes());
             }
+            
             ScreenCommand::Clear => {
                 self.call_data.push(3);
             }
-            ScreenCommand::Text(text, x, y) => {
+            
+            ScreenCommand::Text(text, p) => {
                 self.call_data.push(4);
-                self.push_data(&x.to_be_bytes());
-                self.push_data(&y.to_be_bytes());
+                self.push_data(&p.x.to_be_bytes());
+                self.push_data(&p.y.to_be_bytes());
                 self.push_data(&(text.as_bytes().len() as i16).to_be_bytes());
                 self.push_data(text.as_bytes());
             }
-            ScreenCommand::Rect(x, y, w, h) => {
+
+            ScreenCommand::Rect(p, v) => {
                 self.call_data.push(5);
-                self.push_data(&x.to_be_bytes());
-                self.push_data(&y.to_be_bytes());
-                self.push_data(&w.to_be_bytes());
-                self.push_data(&h.to_be_bytes());
+                self.push_data(&p.x.to_be_bytes());
+                self.push_data(&p.y.to_be_bytes());
+                self.push_data(&v.x.to_be_bytes());
+                self.push_data(&v.y.to_be_bytes());
             }
-            ScreenCommand::FilledRect(x, y, w, h) => {
+            
+            ScreenCommand::FilledRect(p, v) => {
                 self.call_data.push(6);
-                self.push_data(&x.to_be_bytes());
-                self.push_data(&y.to_be_bytes());
-                self.push_data(&w.to_be_bytes());
-                self.push_data(&h.to_be_bytes());
+                self.push_data(&p.x.to_be_bytes());
+                self.push_data(&p.y.to_be_bytes());
+                self.push_data(&v.x.to_be_bytes());
+                self.push_data(&v.y.to_be_bytes());
             }
+            
             ScreenCommand::SetColor(color) => {
                 self.call_data.push(7);
                 self.push_data(&color);
             }
+            
             ScreenCommand::Polygon(points) => {
                 self.call_data.push(8);
                 self.push_data(&(points.len() as i16).to_be_bytes());
                 for p in points {
-                    self.push_data(&p.0.to_be_bytes());
-                    self.push_data(&p.1.to_be_bytes());
+                    self.push_data(&p.x.to_be_bytes());
+                    self.push_data(&p.y.to_be_bytes());
                 }
             }
+            
             ScreenCommand::FilledPolygon(points) => {
                 self.call_data.push(9);
                 self.push_data(&(points.len() as i16).to_be_bytes());
                 for p in points {
-                    self.push_data(&p.0.to_be_bytes());
-                    self.push_data(&p.1.to_be_bytes());
+                    self.push_data(&p.x.to_be_bytes());
+                    self.push_data(&p.y.to_be_bytes());
                 }
             }
+            
             ScreenCommand::PolygonLine(points) => {
                 self.call_data.push(10);
                 self.push_data(&(points.len() as i16).to_be_bytes());
                 for p in points {
-                    self.push_data(&p.0.to_be_bytes());
-                    self.push_data(&p.1.to_be_bytes());
+                    self.push_data(&p.x.to_be_bytes());
+                    self.push_data(&p.y.to_be_bytes());
                 }
             }
-            ScreenCommand::Oval(x, y, w, h) => {
+           
+            ScreenCommand::Oval(p, v) => {
                 self.call_data.push(11);
-                self.push_data(&x.to_be_bytes());
-                self.push_data(&y.to_be_bytes());
-                self.push_data(&w.to_be_bytes());
-                self.push_data(&h.to_be_bytes());
+                self.push_data(&p.x.to_be_bytes());
+                self.push_data(&p.y.to_be_bytes());
+                self.push_data(&v.x.to_be_bytes());
+                self.push_data(&v.y.to_be_bytes());
             }
         }
     }
@@ -124,54 +172,55 @@ impl DrawCall {
             | ScreenCommand::SetColor(..)
             | ScreenCommand::Pixel(..)
             | ScreenCommand::Text(..) => self.push_command(command),
-            ScreenCommand::Line(x1, y1, x2, y2) => {
+            ScreenCommand::Line(p1, p2) => {
                 self.push_command(command);
 
                 let mut x_off = 0;
                 let mut y_off = 0;
 
-                if x1 < 0 || x2 < 0 {
+                if p1.x < 0 || p2.x < 0 {
                     x_off = self.width
                 }
-                if x1 >= self.width || x2 >= self.width {
+                if p1.x >= self.width || p2.x >= self.width {
                     x_off = -self.width
                 }
-                if y1 < 0 || y2 < 0 {
+                if p1.y < 0 || p2.y < 0 {
                     y_off = self.height
                 }
-                if y1 >= self.height || y2 >= self.height {
+                if p1.y >= self.height || p2.y >= self.height {
                     y_off = -self.height
                 }
 
                 if x_off != 0 {
-                    self.push_command(ScreenCommand::Line(x1 + x_off, y1, x2 + x_off, y2));
+                    self.push_command(ScreenCommand::Line((p1.x + x_off, p1.y).into(), (p2.x + x_off, p2.y).into()));
                 }
                 if y_off != 0 {
-                    self.push_command(ScreenCommand::Line(x1, y1 + y_off, x2, y2 + y_off));
+                    self.push_command(ScreenCommand::Line((p1.x, p1.y + y_off).into(), (p2.x, p2.y + y_off).into()));
                 }
 
                 if x_off != 0 && y_off != 0 {
                     self.push_command(ScreenCommand::Line(
-                        x1 + x_off,
-                        y1 + y_off,
-                        x2 + x_off,
-                        y2 + y_off,
+                        (p1.x + x_off,
+                        p1.y + y_off).into(),
+                        (p2.x + x_off,
+                        p2.y + y_off).into()
                     ));
                 }
             }
-            ScreenCommand::Rect(x, y, w, h) => {
+            ScreenCommand::Rect(p, v) => {
                 self.call_data.push(5);
-                self.push_data(&x.to_be_bytes());
-                self.push_data(&y.to_be_bytes());
-                self.push_data(&w.to_be_bytes());
-                self.push_data(&h.to_be_bytes());
+                self.push_data(&p.x.to_be_bytes());
+                self.push_data(&p.y.to_be_bytes());
+                self.push_data(&v.x.to_be_bytes());
+                self.push_data(&v.y.to_be_bytes());
             }
-            ScreenCommand::FilledRect(x, y, w, h) => {
+            
+            ScreenCommand::FilledRect(p, v) => {
                 self.call_data.push(6);
-                self.push_data(&x.to_be_bytes());
-                self.push_data(&y.to_be_bytes());
-                self.push_data(&w.to_be_bytes());
-                self.push_data(&h.to_be_bytes());
+                self.push_data(&p.x.to_be_bytes());
+                self.push_data(&p.y.to_be_bytes());
+                self.push_data(&v.x.to_be_bytes());
+                self.push_data(&v.y.to_be_bytes());
             }
 
             ScreenCommand::Polygon(points) => {
@@ -186,74 +235,74 @@ impl DrawCall {
                 self.call_data.push(10);
                 self.wrapped_points(points);
             }
-            ScreenCommand::Oval(x, y, w, h) => {
+            ScreenCommand::Oval(p, v) => {
                 self.call_data.push(11);
-                self.push_data(&x.to_be_bytes());
-                self.push_data(&y.to_be_bytes());
-                self.push_data(&w.to_be_bytes());
-                self.push_data(&h.to_be_bytes());
+                self.push_data(&p.x.to_be_bytes());
+                self.push_data(&p.y.to_be_bytes());
+                self.push_data(&v.x.to_be_bytes());
+                self.push_data(&v.y.to_be_bytes());
 
                 let mut x_off = 0;
                 let mut y_off = 0;
 
-                if x + w >= self.width {
+                if p.x + v.x >= self.width {
                     x_off = -self.width
                 }
-                if x - w < 0 {
+                if p.x - v.x < 0 {
                     x_off = self.width
                 }
-                if y + w >= self.height {
+                if p.y + v.y >= self.height {
                     y_off = -self.height
                 }
-                if y - w < 0 {
+                if p.y - v.y < 0 {
                     y_off = self.height
                 }
 
                 if x_off != 0 {
                     self.call_data.push(11);
-                    self.push_data(&(x + x_off).to_be_bytes());
-                    self.push_data(&y.to_be_bytes());
-                    self.push_data(&w.to_be_bytes());
-                    self.push_data(&h.to_be_bytes());
+                    self.push_data(&(p.x + x_off).to_be_bytes());
+                    self.push_data(&p.y.to_be_bytes());
+                    self.push_data(&v.x.to_be_bytes());
+                    self.push_data(&v.y.to_be_bytes());
                 }
                 if y_off != 0 {
                     self.call_data.push(11);
-                    self.push_data(&x.to_be_bytes());
-                    self.push_data(&(y + y_off).to_be_bytes());
-                    self.push_data(&w.to_be_bytes());
-                    self.push_data(&h.to_be_bytes());
+                    self.push_data(&p.x.to_be_bytes());
+                    self.push_data(&(p.y + y_off).to_be_bytes());
+                    self.push_data(&v.x.to_be_bytes());
+                    self.push_data(&v.y.to_be_bytes());
                 }
 
                 if x_off != 0 && y_off != 0 {
                     self.call_data.push(11);
-                    self.push_data(&(x + x_off).to_be_bytes());
-                    self.push_data(&(y + y_off).to_be_bytes());
-                    self.push_data(&w.to_be_bytes());
-                    self.push_data(&h.to_be_bytes());
+                    self.push_data(&(p.x + x_off).to_be_bytes());
+                    self.push_data(&(p.y + y_off).to_be_bytes());
+                    self.push_data(&v.x.to_be_bytes());
+                    self.push_data(&v.y.to_be_bytes());
                 }
             }
         }
     }
 
-    pub fn wrapped_points(&mut self, points: &[(i16, i16)]) {
+    pub fn wrapped_points(&mut self, points: &[ScreenPos]) {
         self.push_data(&(points.len() as i16).to_be_bytes());
 
         let mut x_off = 0;
         let mut y_off = 0;
 
         for p in points {
-            self.push_data(&p.0.to_be_bytes());
-            self.push_data(&p.1.to_be_bytes());
-            if p.0 < 0 {
+            self.push_data(&p.x.to_be_bytes());
+            self.push_data(&p.y.to_be_bytes());
+            if p.x < 0 {
                 x_off = self.width;
             }
-            if p.0 >= self.width {
+            if p.x >= self.width {
                 x_off = -self.width;
             }
-            if p.1 < 0 {
+            if p.y < 0 {
                 y_off = self.height;
             }
-            if p.1 >= self.height {
+            if p.y >= self.height {
                 y_off = -self.height;
             }
         }
@@ -262,16 +311,16 @@ impl DrawCall {
             self.call_data.push(8);
             self.push_data(&(points.len() as i16).to_be_bytes());
             for p in points {
-                self.push_data(&(p.0 + x_off).to_be_bytes());
-                self.push_data(&p.1.to_be_bytes());
+                self.push_data(&(p.x + x_off).to_be_bytes());
+                self.push_data(&p.y.to_be_bytes());
             }
         }
         if y_off != 0 {
             self.call_data.push(8);
             self.push_data(&(points.len() as i16).to_be_bytes());
             for p in points {
-                self.push_data(&p.0.to_be_bytes());
-                self.push_data(&(p.1 + y_off).to_be_bytes());
+                self.push_data(&p.x.to_be_bytes());
+                self.push_data(&(p.y + y_off).to_be_bytes());
             }
         }
 
@@ -279,8 +328,8 @@ impl DrawCall {
             self.call_data.push(8);
             self.push_data(&(points.len() as i16).to_be_bytes());
             for p in points {
-                self.push_data(&(p.0 + x_off).to_be_bytes());
-                self.push_data(&(p.1 + y_off).to_be_bytes());
+                self.push_data(&(p.x + x_off).to_be_bytes());
+                self.push_data(&(p.y + y_off).to_be_bytes());
             }
         }
     }

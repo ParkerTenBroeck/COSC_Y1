@@ -11,6 +11,7 @@ num-bigint = { version = "*", default-features = false}
 libm = "*"
 spin = "*"
 wee_alloc = { version = "*", features = ["static_array_backend"]}
+rand_pcg = "*"
 
 [dependencies.num-traits]
 version = "0.2"

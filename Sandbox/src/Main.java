@@ -19,7 +19,6 @@ public class Main {
     public static void main(String[] args) throws Exception{
 
         Turtle yertle = new Turtle();
-
         TurtleDisplayer display = new TurtleDisplayer(yertle, 720, 480);
 
         yertle.penDown();
@@ -224,12 +223,31 @@ public class Main {
         for(int i = 0; i < bytes.length; i ++){
             vm.setByte(i, bytes[i]);
         }
+        while (true){
+            long startTime = System.nanoTime();
+            vm.run();
+            long endTime = System.nanoTime();
+            System.out.printf("VM Execution time: %.8fs%n", (endTime - startTime) / 1000000000.0);
 
-        long startTime = System.nanoTime();
-        vm.run();
-        long endTime = System.nanoTime();
-        System.out.printf("VM Execution time: %.8fs%n", (endTime - startTime) / 1000000000.0);
-        vm.reset();
+            while (true){
+                if (keys.isKeyCharPressed('r')){
+                    vm.reset();
+                    for(int i = 0; i < bytes.length; i ++){
+                        vm.setByte(i, bytes[i]);
+                    }
+                    for(int i = (bytes.length + 3) / 4; i < vm.memory.length; i ++){
+                        vm.memory[i] = 0;
+                    }
+                    break;
+                }else if (keys.isKeyCharPressed('e')){
+                    System.out.println("Exiting");
+                    return;
+                }
+                crankySleep(1);
+            }
+
+        }
+
     }
 
     // OooOOoOoOO hacker
