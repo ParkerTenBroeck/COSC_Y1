@@ -14,9 +14,10 @@ rustflags = [
 #"-C", "link-arg=-Wl,-r", #marks as relocatable??
 
 #"-C", "link-arg=--no-compact-branches", #i cant remember
-"-C", "link-arg=--emit-relocs", #puts relocs in generated file
+#"-C", "link-arg=--emit-relocs", #puts relocs in generated file
 #"-C", "link-arg=-n",
-
+#"-C", "link-arg=--pic-executable",
+"-C", "link-arg=--verbose",
 "-C", "link-arg=-T",
 "-C", "link-arg=mips/link.map",
 

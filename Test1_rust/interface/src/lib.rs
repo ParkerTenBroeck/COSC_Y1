@@ -24,7 +24,8 @@ extern "C" fn _start() -> ! {
     unsafe {
         core::arch::asm! {
             ".set noat",
-            "la $gp, _gp",
+            //".cpload $25",
+            "la $gp, _gp_disp",
             "la $sp, _sp ",
             "move $fp, $sp",
             "jal main",

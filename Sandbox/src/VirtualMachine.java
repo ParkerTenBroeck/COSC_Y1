@@ -21,6 +21,8 @@ public class VirtualMachine {
     protected int[] memory = new int[0];
     protected boolean running = false;
 
+    protected long instructionsRan = 0;
+
     // this can only have 2 valid values 0 or 1 (yes I know it should be a bool but this is cheaper)
     // this is used for atomic read and writes any modification to memory should set this to 0
     protected byte LLVal = 0;
@@ -34,6 +36,7 @@ public class VirtualMachine {
         this.high = 0;
         this.pc = 0;
         this.LLVal = 0;
+        this.instructionsRan = 0;
     }
 
     public void run() throws Exception{
@@ -422,6 +425,8 @@ public class VirtualMachine {
                         SEa = (opCode << 16) >> 14;
                         if (this.registers[s] == this.registers[t]) {
                             this.pc += SEa;
+                        }else{
+                            this.pc += 4;
                         }
                         break;
                     case 0b000001:
@@ -432,12 +437,19 @@ public class VirtualMachine {
                             //BGEZ
                             if (this.registers[s] >= 0){
                                 this.pc += SEa;
+                            }else{
+                                this.pc += 4;
                             }
                         }else if (t == 0b00000){
                             //BLTZ
                             if (this.registers[s] < 0){
                                 this.pc += SEa;
+                            }else{
+                                this.pc += 4;
                             }
+                        }else if (t == 0b10001){
+                            this.registers[31] = this.pc;
+                            this.pc += SEa;
                         }else{
                             throw new Exception("Invalid OpCode: " + opCode + " at: " + (this.pc - 4));
                         }
@@ -448,6 +460,8 @@ public class VirtualMachine {
                         SEa = (opCode << 16) >> 14;
                         if (this.registers[s] > 0) {
                             this.pc += SEa;
+                        }else{
+                            this.pc += 4;
                         }
                         break;
                     case 0b000110:
@@ -456,6 +470,8 @@ public class VirtualMachine {
                         SEa = (opCode << 16) >> 14;
                         if (this.registers[s] <= 0) {
                             this.pc += SEa;
+                        }else{
+                            this.pc += 4;
                         }
                         break;
                     case 0b000101:
@@ -465,6 +481,8 @@ public class VirtualMachine {
                         SEa = (opCode << 16) >> 14;
                         if (this.registers[s] != this.registers[t]) {
                             this.pc += SEa;
+                        }else{
+                            this.pc += 4;
                         }
                         break;
 
@@ -609,6 +627,7 @@ public class VirtualMachine {
                     default:
                         throw new Exception("Invalid Instruction: " + opCode + " at: " + (this.pc - 4));
                 }
+                this.instructionsRan += 1;
             }
         }catch(Exception e){
             System.err.println("Run time exception: " + e);

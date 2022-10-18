@@ -42,6 +42,11 @@ pub fn main() {
         game.run_frame();
     }
 
+    macros::java!{
+ASD SD s ss
+        * / . 
+    }
+
     // println!("Hello world!");
     // println!("Factorial 34 {}", factorial(34));
 

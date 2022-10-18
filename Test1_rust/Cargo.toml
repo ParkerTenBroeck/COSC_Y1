@@ -3,6 +3,7 @@
 members = [
 	"binary",
 	"interface",
+	"macros",
 ]
 
 [profile.release]

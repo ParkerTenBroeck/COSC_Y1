@@ -12,6 +12,7 @@ libm = "*"
 spin = "*"
 wee_alloc = { version = "*", features = ["static_array_backend"]}
 rand_pcg = "*"
+macros = { version = "*", path = "../macros"}
 
 [dependencies.num-traits]
 version = "0.2"

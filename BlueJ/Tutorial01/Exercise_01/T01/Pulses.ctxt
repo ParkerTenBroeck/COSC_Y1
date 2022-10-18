@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.target=Pulses
+comment0.text=\ TurtleGraphics\ application\ for\ Exercise\ 1\ that\ draws\ a\ \n\ pulse\ graph\ using\ nested\ and\ non\ nested\ loops.\n\n\ @author\ D.\ Bockus,\ adapted\ \ by\ Dave\ Hughes\n\n\ @version\ 1.1\ (Sept.\ 2002)\n@version\ 1.2\ -\ Dave\ Hughes\ (Sept.\ 2010)
+comment1.params=
+comment1.target=Pulses()
+comment1.text=The\ constructor\ uses\ a\ Turtle\ to\ draw\ the\ graph
+comment2.params=args
+comment2.target=void\ main(java.lang.String[])
+numComments=3

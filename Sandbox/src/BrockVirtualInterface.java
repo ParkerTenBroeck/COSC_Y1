@@ -76,6 +76,10 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                     }
                 }catch (Exception ignore){}
                 break;
+            case 3:
+                emu.registers[3] = (int)(emu.instructionsRan >> 32);
+                emu.registers[2] = (int)emu.instructionsRan;
+                break;
             case 4:
                 int address = emu.registers[4];
                 for(int i = 0; i < 500; i ++){
@@ -148,6 +152,13 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
             case 103:
                 {
                     Class clazz = (Class)this.get_object(emu.registers[4]);
+                    try{
+                        Method m = clazz.getMethod("", new Class[]{});
+                        Object ret = m.invoke(null, null);
+                        Class i_clazz = int.class;
+                    }catch (Exception e){
+
+                    }
                     String name = clazz.getName();
                     int id = this.insert_object(name);
                     emu.registers[2] = id;

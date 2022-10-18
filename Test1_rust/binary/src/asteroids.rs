@@ -1,5 +1,7 @@
 extern crate alloc;
 
+use core::ops::Sub;
+
 use alloc::boxed::Box;
 use alloc::format;
 use alloc::vec::Vec;
@@ -9,6 +11,47 @@ use interface::screen::ScreenCommand;
 use num_traits::Zero;
 
 use crate::asteroids::util::*;
+
+
+#[derive(Default, Clone, Copy)]
+struct FrameInfo{
+    time_nano: u64,
+    instructions_ran: u64,
+}
+
+struct RollingTracker{
+    pos: usize,
+    frames: [FrameInfo; 256]
+}
+
+impl RollingTracker{
+    
+    pub fn new() -> Self{
+            Self { pos: 0, frames: [Default::default(); 256] }
+    }
+
+    pub fn average_frame_time(&self) -> f32{
+        let now = self.frames[self.pos];
+        let oldest = self.frames[(self.pos as isize).sub(1) as usize & 0xFF];
+        (oldest.time_nano.wrapping_sub(now.time_nano)) as f32 / 256.0 / 1000000000.0
+    }
+
+    pub fn average_instructions_per_frame(&self) -> f32{
+        let now = self.frames[self.pos];
+        let oldest = self.frames[(self.pos as isize).sub(1) as usize & 0xFF];
+        (oldest.instructions_ran.wrapping_sub(now.instructions_ran)) as f32 / 256.0
+    }
+
+    pub fn new_frame(&mut self, time_mill: u64, instructions_ran: u64){
+        self.frames[self.pos] = FrameInfo{
+            time_nano: time_mill,
+            instructions_ran,
+        };
+        self.pos += 1;
+        self.pos &= 0xFF;
+    }
+}
+
 
 pub struct Game {
     screen: Screen,
@@ -27,6 +70,7 @@ pub struct Game {
     t_time: f32,
     show_debug: bool,
     new_level_cooldown: Option<f32>,
+    tracker: RollingTracker,
 }
 
 impl Default for Game {
@@ -54,6 +98,7 @@ impl Game {
             particles: Vec::new(),
             show_debug: false,
             new_level_cooldown: None,
+            tracker: RollingTracker::new(),
         }
     }
 
@@ -66,6 +111,11 @@ impl Game {
     }
 
     pub fn run_frame(&mut self) {
+
+        let instructions_ran = interface::sys::get_instructions_ran();
+        let now = interface::sys::current_time_nanos();
+        self.tracker.new_frame(now, instructions_ran);
+
         if self.reset {
             self.alian_ship = None;
             self.bullets.clear();
@@ -92,8 +142,6 @@ impl Game {
         self.screen
             .push_command(ScreenCommand::SetColor([0, 0, 0, 255]));
         self.screen.push_command(ScreenCommand::Clear);
-
-        let now = interface::sys::current_time_nanos();
 
         // it would be more usful if uh we actaually calculated this but im lazy
         // and the sleep_d_ms does an *ok* job at making this true
@@ -302,6 +350,12 @@ impl Game {
         let str = format!("lives: {}", self.lives);
         self.screen.push_command(ScreenCommand::Text(&str, (self.screen.get_width() / 2 - str.len() as i16 * 5 / 2, 40i16).into()));
 
+        let str = format!("fps: {:.0}", 1.0 / self.tracker.average_frame_time());
+        self.screen.push_command(ScreenCommand::Text(&str, (self.screen.get_width() / 2 - str.len() as i16 * 5 / 2, 55i16).into()));
+        let str = format!("ipf: {:.0}", self.tracker.average_instructions_per_frame());
+        self.screen.push_command(ScreenCommand::Text(&str, (self.screen.get_width() / 2 - str.len() as i16 * 5 / 2, 70i16).into()));
+
+
         if self.show_debug {
             self.draw_debug_str(&format!("particles: {:.2}", self.particles.len()));
             self.draw_debug_str(&format!("asteroids: {:.2}", self.asteroids.len()));
@@ -382,6 +436,7 @@ const SHIP_FIRE_OUTER: [Vector; 3] = [
 ];
 
 impl Ship {
+
     pub fn update(game: &mut Game, d_time: f32) -> ShipCollision {
         if game.show_debug {
             game.draw_debug_str(&format!("acc_x: {:.2}", game.ship.acc.x));

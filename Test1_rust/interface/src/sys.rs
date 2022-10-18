@@ -12,6 +12,12 @@ pub const HALT: u32 = 0;
 /// Register 4: i32 value
 pub const PRINT_DEC_NUMBER: u32 = 1;
 
+/// Get number of instructions ran
+///
+/// Register 2: upper half of instruction count
+/// Register 3: lower half of instruction count
+pub const GET_INSTRUCTIONS_RAN: u32 = 3;
+
 /// Print a C-String ending in a \0 byte.
 ///
 /// Register 4: ptr to begining of string
@@ -214,9 +220,16 @@ pub fn print_i32(num: i32) {
 }
 
 #[inline(always)]
+pub fn get_instructions_ran() -> u64{
+    unsafe{
+        syscall_0_2_s::<GET_INSTRUCTIONS_RAN>()
+    }
+}
+
+#[inline(always)]
 pub fn print_zero_term_str(str: &str) {
     unsafe {
-        syscall_1_0::<PRINT_C_STRING>(str.as_ptr().addr() as u32);
+        syscall_1_0::<GET_INSTRUCTIONS_RAN>(str.as_ptr().addr() as u32);
     }
 }
 
