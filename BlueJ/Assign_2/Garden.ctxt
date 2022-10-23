@@ -5,6 +5,7 @@ comment1.params=
 comment1.target=Garden()
 comment2.params=
 comment2.target=void\ drawPetal()
+comment2.text=\n\ Location\ and\ angle\ of\ this.turtle\ is\ preserved\ with\ this\ procedure\n
 comment3.params=
 comment3.target=void\ drawFlower()
 comment4.params=
