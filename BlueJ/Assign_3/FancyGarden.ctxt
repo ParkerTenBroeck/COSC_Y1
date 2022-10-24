@@ -1,0 +1,24 @@
+#BlueJ class context
+comment0.target=FancyGarden
+comment0.text=\n\ @author\ Parker\ TenBroeck\ 7376726\n\ Assignment\ 3\n
+comment1.params=
+comment1.target=FancyGarden()
+comment2.params=color
+comment2.target=void\ fillScreen(java.awt.Color)
+comment2.text=\n\ fills\ the\ entire\ screen\ with\ color\n\ The\ turtles\ state\ is\ preserved\ except\ for\ it's\ penColor\n\ @param\ color\ the\ color\ to\ fill\ the\ screen\ with\n
+comment3.params=petalPoint
+comment3.target=void\ drawPetal(double)
+comment3.text=\n\ Draw\ a\ petal\ with\ the\ current\ state\ of\ the\ turtle\n\ Location\ and\ angle\ of\ this.turtle\ is\ preserved\ with\ this\ procedure\n\ @\ param\ petalPoint\ the\ length\ of\ the\ petal\ point\ described\ in\ the\ lesson\ PDF\n
+comment4.params=petalNumber\ petalPoint
+comment4.target=void\ drawFlower(int,\ double)
+comment4.text=\n\ Draws\ a\ flower\ with\ the\ number\ of\ petals\ given\ by\ PetalNumber\ \n\ where\ sized\ is\ based\ off\ petalPoint\n\ Location\ and\ angle\ of\ this.turtle\ is\ preserved\ with\ this\ procedure\n\ @\ param\ petalNumber\ the\ number\ of\ petals\ each\ flower\ should\ have\n\ @\ param\ petalPoint\ the\ length\ of\ the\ petal\ point\ described\ in\ the\ lesson\ PDF\n
+comment5.params=min\ max
+comment5.target=double\ randomRange(double,\ double)
+comment5.text=\n\ Generate\ a\ random\ value\ within\ a\ range\n\ @\ param\ min\ the\ lowest\ value\ that\ will\ be\ returned\n\ @\ param\ max\ the\ upper\ bound\ of\ the\ value\ returned\n\ @\ return\ a\ random\ value\ greater\ than\ or\ equal\ to\ min\ and\ less\ than\ max\n
+comment6.params=petalPoint
+comment6.target=void\ drawPoinsettia(double)
+comment6.text=\n\ Draws\ a\ poinsettia\ at\ the\ current\ location\n\ Location\ and\ angle\ of\ this.turtle\ is\ preserved\ with\ this\ procedure\n\ The\ turtles\ pen\ color\ is\ not\ preserved\ with\ this\ procedure\n\ @\ param\ petalPoint\ the\ length\ of\ the\ petal\ point\ described\ in\ the\ lesson\ PDF\n
+comment7.params=
+comment7.target=void\ drawGarden()
+comment7.text=\n\ Draw\ 16\ flowers\ evenly\ spaced\ in\ a\ grid\ pattern\n
+numComments=8

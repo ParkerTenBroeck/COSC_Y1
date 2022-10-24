@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=Garden
-comment0.text=\n\ @author\ Parker\ TenBroeck\ 7376726\n
+comment0.text=\n\ @author\ Parker\ TenBroeck\ 7376726\n\ Assignment\ 2\n
 comment1.params=
 comment1.target=Garden()
 comment2.params=
@@ -8,6 +8,8 @@ comment2.target=void\ drawPetal()
 comment2.text=\n\ Location\ and\ angle\ of\ this.turtle\ is\ preserved\ with\ this\ procedure\n
 comment3.params=
 comment3.target=void\ drawFlower()
+comment3.text=\n\ Location\ and\ angle\ of\ this.turtle\ is\ preserved\ with\ this\ procedure\n
 comment4.params=
 comment4.target=void\ drawGarden()
+comment4.text=\n\ Draw\ 16\ flowers\ evenly\ spaced\ in\ a\ grid\ pattern\n
 numComments=5
