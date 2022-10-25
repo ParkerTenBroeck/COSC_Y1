@@ -33,6 +33,7 @@ public class FancyGarden
         
         // rotate to face 0 degrees to the right of the screen
         this.turtle.left(angle);
+        
         this.turtle.setPenColor(color);
         // move to center left
         this.turtle.moveTo(-300.0 / 2.0, 0);
@@ -105,11 +106,14 @@ public class FancyGarden
     
     /**
      * Draws a poinsettia at the current location
-     * Location and angle of this.turtle is preserved with this procedure
+     * Angle of turtle is preserved
      * The turtles pen color is not preserved with this procedure
+     * @ param x the x location to draw the poinsettia at
+     * @ param y the y location to draw the poinsettia at
      * @ param petalPoint the length of the petal point described in the lesson PDF
      */
-    public void drawPoinsettia(double petalPoint){
+    public void drawPoinsettia(double x, double y, double petalPoint){
+        this.turtle.moveTo(x, y);
         // random number of petals between 4 and 7
         int petalNumber = (int)randomRange(4.0, 8.0);
         // draws a red outer flower
@@ -143,8 +147,7 @@ public class FancyGarden
                 double fx = x * ((width - rad * 2) / 3.0) + rad - width / 2.0;
                 double fy = y * ((height - rad * 2) / 3.0) + rad - height / 2.0;
                 this.turtle.penUp();
-                this.turtle.moveTo(fx, fy);
-                this.drawPoinsettia(petalPoint);
+                this.drawPoinsettia(fx, fy, petalPoint);
             }
         }
     }

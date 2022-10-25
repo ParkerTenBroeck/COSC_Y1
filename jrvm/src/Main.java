@@ -16,36 +16,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Main {
+
+    public static String BIN_PATH = "../jrrt/mips/bin/tmp.bin";
+
     public static void main(String[] args) throws Exception{
 
         Turtle yertle = new Turtle();
         TurtleDisplayer display = new TurtleDisplayer(yertle, 720, 480);
-
-
-        yertle.penDown();
-        yertle.right(Math.PI/2);
-        yertle.forward(100);
-        yertle.left(Math.PI);
-        yertle.forward(50);
-        yertle.right(Math.PI/2);
-        yertle.forward(50);
-        yertle.right(Math.PI/2);
-        yertle.forward(50);
-        yertle.left(Math.PI/2);
-        yertle.penUp();
-        yertle.forward(50);
-        yertle.left(Math.PI/2);
-        yertle.penDown();
-        yertle.forward(50);
-        yertle.penUp();
-        yertle.forward(25);
-        yertle.penDown();
-        yertle.forward(25);
-
-
-        Thread.sleep(1000);
-
-
 
         BasicForm basicForm;
         GeneralCanvas canvas;
@@ -136,8 +113,7 @@ public class Main {
 
         //14, 19, 20
         Random ran = new Random(27);
-        Thread.sleep(400);
-        recursive_removal_fun(frame, root_pane, 200, ran);
+        recursive_removal_fun(frame, root_pane, 0, ran);
 
         root_pane.removeAll();
         root_pane.add(canvas);
@@ -157,40 +133,7 @@ public class Main {
         frame.requestFocus();
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-
-
-        frame.setTitle("");
-        String fullTitle = "Asteroids V1.1";
-        for (char c: fullTitle.toCharArray()){
-            frame.setTitle(frame.getTitle() + c);
-            crankySleep(300);
-        }
-
-        {
-
-            int tmp1 = image.getWidth() / 9;
-            int[] tmp = new int[image.getHeight()];
-            for(int i = 0; i < tmp.length; i ++){
-                tmp[i] = ran.nextInt(tmp1);
-            }
-            g.setColor(Color.BLACK);
-
-            for(int i = 0; i < image.getWidth() / 2 + tmp1; i ++){
-                for(int y = 0; y < image.getHeight(); y ++){
-                    int x1 = i - tmp[y];
-                    int x2 = image.getWidth() - i - tmp[y] + tmp1;
-                    if (x1 >= 0 && x1 < image.getWidth()){
-                        g.drawLine(x1, y, x1, y);
-                    }
-                    if (x2 >= 0 && x2 < image.getWidth()){
-                        g.drawLine(x2, y, x2, y);
-                    }
-                }
-                frame.repaint();
-                crankySleep(10);
-            }
-        }
-
+        frame.setTitle("JRVM");
 
         runVm(image, frame, test);
     }
@@ -220,7 +163,7 @@ public class Main {
         //byte[] bytes = new byte[] {0x3c,0x02,0x7F, (byte)0xFF, 0x00, 0x00, 0x08, 0x20, 0x20, 0x21, 0x00, 0x01, 0x10, 0x22, 0x00, 0x01, 0x08, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x0C};
 
         //load binary into memory
-        byte[] bytes = Files.readAllBytes(new File("../Test1_rust/mips/bin/tmp.bin").toPath());
+        byte[] bytes = Files.readAllBytes(new File(BIN_PATH).toPath());
         for(int i = 0; i < bytes.length; i ++){
             vm.setByte(i, bytes[i]);
         }
