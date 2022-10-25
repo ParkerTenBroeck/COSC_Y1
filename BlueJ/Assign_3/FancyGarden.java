@@ -121,7 +121,7 @@ public class FancyGarden
         this.drawFlower(petalNumber, petalPoint);
         // draws a yellow inner flower
         this.turtle.setPenColor(Color.YELLOW);    
-        this.drawFlower(petalNumber, petalPoint / 2);
+        this.drawFlower(petalNumber, petalPoint / 2.0);
     }
     
     /**
