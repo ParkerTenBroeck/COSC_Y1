@@ -1,4 +1,4 @@
-use crate::nji::*;
+use crate::nji::object::Object;
 use crate::sys::*;
 
 pub struct Turtle(Object);

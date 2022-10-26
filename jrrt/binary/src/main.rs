@@ -137,6 +137,15 @@ impl BinaryTreeIsh {
 #[no_mangle]
 pub fn main() {
     let mut screen = interface::screen::Screen::new();
+    
+    lazy_static::lazy_static! {
+        static ref OBJECT: interface::nji::Class = {
+            //interface::nji::Class::new("");
+            panic!();
+        };
+    }
+
+    
 
     loop {
         use screen::ScreenCommand::*;
@@ -148,6 +157,8 @@ pub fn main() {
             interface::sys::halt();
         }
     }
+
+    
 
     macros::java! {
     ASD SD s ss
