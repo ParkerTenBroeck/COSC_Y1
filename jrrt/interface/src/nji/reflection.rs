@@ -11,3 +11,7 @@ pub type FieldRef = ObjectRef<Field>;
 
 pub struct Constructor;
 pub type ConstructorRef = ObjectRef<Constructor>;
+
+impl ConstructorRef{
+    
+}

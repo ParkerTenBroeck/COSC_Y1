@@ -47,12 +47,23 @@ impl<T> ObjectRef<T> {
     /// # Safety
     ///
     /// Must be a valid obj_id
+    pub unsafe fn from_obj_ref(obj_id: ObjectRef<Object>) -> Self {
+        Self(obj_id.0, PhantomData)
+    }
+
+    /// # Safety
+    ///
+    /// Must be a valid obj_id
     pub unsafe fn from_id_bits(obj_id: u32) -> Option<Self> {
         if let Some(obj_id) = NonZeroU32::new(obj_id){
             Some(Self(Object::new(obj_id), PhantomData))
         }else{
             None
         }
+    }
+
+    pub fn to_obj_ref(self) -> ObjectRef<Object>{
+        ObjectRef(self.0, PhantomData)
     }
 
     pub fn id_bits(&self) -> u32 {
@@ -99,9 +110,7 @@ impl Drop for Object {
 }
 
 
-pub struct ObjectArray<T>{
-    _phantom: PhantomData<T>
-}
+pub struct ObjectArray<T>(PhantomData<T>);
 
 pub type ObjectArrayRef<T> = ObjectRef<ObjectArray<T>>;
 

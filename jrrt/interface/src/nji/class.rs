@@ -12,7 +12,17 @@ use super::{
 pub struct Class;
 pub type ClassRef = ObjectRef<Class>;
 
+
 impl ClassRef {
+
+    pub fn for_name(name: &str) -> Option<Self>{
+        unsafe{
+            Self::from_id_bits(
+                syscall_2_1::<CLASS_FOR_NAME>(name.as_ptr() as u32, name.len() as u32)
+            )
+        }
+    }
+
     pub fn get_name(&self) -> String {
         unsafe {
             let (str_id, len) = syscall_1_2::<GET_FULL_CLASS_NAME>(self.id_bits());

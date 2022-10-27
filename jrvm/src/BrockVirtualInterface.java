@@ -240,6 +240,7 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                 {
                     Class clazz = (Class)this.get_object(emu.registers[4]);
                     Method[] fields = clazz.getDeclaredMethods();
+
                     int id = this.insert_object(fields);
                     emu.registers[2] = id;
                     emu.registers[3] = fields.length;
@@ -249,6 +250,7 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                 {
                     Class clazz = (Class)this.get_object(emu.registers[4]);
                     Constructor[] fields = clazz.getDeclaredConstructors();
+
                     int id = this.insert_object(fields);
                     emu.registers[2] = id;
                     emu.registers[3] = fields.length;
@@ -274,6 +276,27 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                     arr[emu.registers[5]] = this.remove_object(emu.registers[6]);
                 }
                 break;
+            case 115:
+                {
+                    try{
+                        int ptr = emu.registers[4];
+                        int len = emu.registers[5];
+                        StringBuilder builder = new StringBuilder();
+                        for(int i = ptr; i < ptr + len; i++){
+                            builder.append((char)emu.getByte(i));
+                        }
+                        Class clazz = Class.forName(builder.toString());
+                        emu.registers[2] = this.insert_object(clazz);
+                    }catch (Exception e){
+                        emu.registers[2] = 0;
+                    }
+                }
+                break;
+            case 199:{
+
+                //Main.class.getClassLoader().
+            }
+            break;
 
             // Turtle specific things
             case 200:
@@ -507,5 +530,14 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
     @Override
     public void breakpoint(VirtualMachine emu, int call_id) {
         throw new RuntimeException("bruh");
+    }
+
+
+    public static class Test extends ClassLoader{
+        @Override
+        public Class<?> loadClass(String name) throws ClassNotFoundException {
+            byte[] data = new byte[0];
+            return super.defineClass(name, data, 0, data.length);
+        }
     }
 }

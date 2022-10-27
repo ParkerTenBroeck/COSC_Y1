@@ -163,7 +163,11 @@ pub const PUT_OBJECT_AT_INDEX: u32 = 114;
 
 
 
-
+/// Get class from name
+/// 
+/// Register 4: Ptr to start of str
+/// Register 5: length of str
+pub const CLASS_FOR_NAME: u32 = 115;
 
 
 

@@ -7,6 +7,7 @@
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 use interface::*;
+use interface::nji::class::ClassRef;
 
 pub mod alloc;
 pub mod panic_handler;
@@ -130,9 +131,9 @@ pub fn main() {
     //         panic!();
     //     };
     // }
-    let turtle = interface::brock_interface::TurtleRef::new();
+    //let turtle = interface::brock_interface::TurtleRef::new();
     //let display = interface::brock_interface::TurtleDisplayerRef::new_with_turtle(&mut turtle);
-    let class = turtle.get_class();
+    let class = ClassRef::for_name("java.lang.Integer").unwrap();//turtle.get_class();
     println!("{:#?}", class.get_fields());
     println!("{:#?}", class.get_methods());
     println!("{:#?}", class.get_constructor());
