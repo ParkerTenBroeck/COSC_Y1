@@ -1,21 +1,15 @@
 extern crate alloc;
 use alloc::string::String;
-
 use super::object::ObjectRef;
 use crate::sys::*;
+
+
 
 pub struct JString;
 pub type JStringRef = ObjectRef<JString>;
 
 impl JStringRef {
-    /// # Safety
-    ///
-    /// must be a valid NJI id that represents a java String
-    // pub unsafe fn new(id: u32) -> Self {
-
-    //     Self(Objectref::new_p(id))
-    // }
-
+    
     pub fn into_naitive_string(self) -> String {
         unsafe {
             let len = syscall_1_1::<JVM_STRING_LENGTH>(self.id_bits());
@@ -41,3 +35,30 @@ impl JStringRef {
         }
     }
 }
+
+// -------------------------------------------------
+
+
+
+pub struct JByte;
+pub type JByteRef = ObjectRef<JByte>;
+
+pub struct JShort;
+pub type JShortRef = ObjectRef<JShort>;
+
+
+pub struct JChar;
+pub type JCharRef = ObjectRef<JChar>;
+
+pub struct JInteger;
+pub type JIntegerRef = ObjectRef<JInteger>;
+
+
+pub struct JFloat;
+pub type JFloatRef = ObjectRef<JFloat>;
+
+pub struct JLong;
+pub type JLongRef = ObjectRef<JLong>;
+
+pub struct JDouble;
+pub type JDoubleRef = ObjectRef<JDouble>;

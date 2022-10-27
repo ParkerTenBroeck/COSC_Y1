@@ -254,6 +254,26 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                     emu.registers[3] = fields.length;
                 }
                 break;
+            case 112:
+                {
+                    int len = emu.registers[4];
+                    Object[] arr = new Object[len];
+                    emu.registers[2] = this.insert_object(arr);
+                }
+            case 113:
+                {
+                    Object[] arr = (Object[])this.get_object(emu.registers[4]);
+                    Object obj = arr[emu.registers[5]];
+                    arr[emu.registers[5]] = null;
+                    emu.registers[2] = this.insert_object(obj);
+                }
+                break;
+            case 114:
+                {
+                    Object[] arr = (Object[])this.get_object(emu.registers[4]);
+                    arr[emu.registers[5]] = this.remove_object(emu.registers[6]);
+                }
+                break;
 
             // Turtle specific things
             case 200:

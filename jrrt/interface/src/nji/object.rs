@@ -6,11 +6,11 @@ use core::{
 };
 
 extern crate alloc;
-use alloc::string::String;
+use alloc::{string::String, vec::Vec};
 
 use crate::sys::*;
 
-use super::{class::ClassRef, jstring::JStringRef};
+use super::{class::ClassRef, primitives::JStringRef};
 
 pub struct Object(pub(super) NonZeroU32);
 
@@ -47,8 +47,12 @@ impl<T> ObjectRef<T> {
     /// # Safety
     ///
     /// Must be a valid obj_id
-    pub unsafe fn from_id_bits(obj_id: u32) -> Self {
-        Self(Object::new_p(obj_id), PhantomData)
+    pub unsafe fn from_id_bits(obj_id: u32) -> Option<Self> {
+        if let Some(obj_id) = NonZeroU32::new(obj_id){
+            Some(Self(Object::new(obj_id), PhantomData))
+        }else{
+            None
+        }
     }
 
     pub fn id_bits(&self) -> u32 {
@@ -65,7 +69,7 @@ impl<T> ObjectRef<T> {
     pub fn to_naitive_string(&self) -> String {
         unsafe {
             let (str_id, len) = syscall_1_2::<JVM_OBJECT_TO_STRING>(self.id_bits());
-            let str = JStringRef::from_id_bits(str_id);
+            let str = JStringRef::from_id_bits(str_id).unwrap();
             str.into_naitive_string_with_capacity(len as usize)
         }
     }
@@ -95,9 +99,78 @@ impl Drop for Object {
 }
 
 
-pub struct ObjectArray;
-pub type ObjectArrayRef = ObjectRef<ObjectArray>;
+pub struct ObjectArray<T>{
+    _phantom: PhantomData<T>
+}
 
-impl ObjectArrayRef{
-    
+pub type ObjectArrayRef<T> = ObjectRef<ObjectArray<T>>;
+
+impl<T> ObjectArrayRef<T>{
+
+    pub fn new(length: usize) -> Self{
+        unsafe{
+            Self::from_id_bits(
+                syscall_1_1::<CREATE_NEW_OBJECT_ARRAY>(length as u32)
+            ).unwrap()
+        }
+    }
+
+    pub fn from_vec(vec: Vec<ObjectRef<T>>) -> Self{
+        let mut new = Self::new(vec.len());
+        for (index, item) in vec.into_iter().enumerate(){
+            new.put_item(index, item)
+        }
+        new
+    }
+
+    /// Items will not be shifted but simply
+    pub fn remove_item(&mut self, index: usize) -> Option<ObjectRef<T>>{
+        unsafe{
+            ObjectRef::from_id_bits(
+                syscall_2_1::<TAKE_OBJECT_AT_INDEX>(self.id_bits(), index as u32)
+            )
+        }
+    }
+
+    pub fn put_item(&mut self, index: usize, item: ObjectRef<T>){
+        unsafe{
+            syscall_3_0::<PUT_OBJECT_AT_INDEX>(self.id_bits(),index as u32, item.id_bits())
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        unsafe { syscall_1_1::<JVM_ARRAY_LENGTH>(self.0.id_bits()) as usize }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn to_native_vec(self) -> Vec<ObjectRef<T>> {
+        let len = self.len();
+        let mut vec = Vec::with_capacity(len);
+        let ptr: *mut ObjectRef<T> = vec.as_mut_ptr();
+        let ptr = ptr.addr();
+        unsafe {
+            let len =
+                syscall_3_1::<MOVE_INTO_NAITIVE_ARRAY>(self.id_bits(), ptr as u32, len as u32);
+            vec.set_len(len as usize);
+            vec
+        }
+    }
+
+    pub fn to_native_vec_with_capacity(self, capacity: usize) -> Vec<ObjectRef<T>> {
+        let mut vec = Vec::with_capacity(capacity);
+        let ptr: *mut ObjectRef<T> = vec.as_mut_ptr();
+        let ptr = ptr.addr();
+        unsafe {
+            let len = syscall_3_1::<MOVE_INTO_NAITIVE_ARRAY>(
+                self.id_bits(),
+                ptr as u32,
+                capacity as u32,
+            );
+            vec.set_len(len as usize);
+            vec
+        }
+    }
 }

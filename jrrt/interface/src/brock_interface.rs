@@ -6,7 +6,7 @@ pub type TurtleRef = ObjectRef<Turtle>;
 
 impl TurtleRef {
     pub fn new() -> Self {
-        unsafe { Self::from_id_bits(syscall_0_1::<CREATE_TURTLE>()) }
+        unsafe { Self::from_id_bits(syscall_0_1::<CREATE_TURTLE>()).unwrap() }
     }
 
     pub fn set_speed(&mut self, speed: i32) {
@@ -49,7 +49,7 @@ impl TurtleDisplayerRef {
         unsafe {
             Self::from_id_bits(syscall_1_1::<CREATE_TURTLE_DISPLAY_WITH_TURTLE>(
                 turtle.id_bits(),
-            ))
+            )).unwrap()
         }
     }
 

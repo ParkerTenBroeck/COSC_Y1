@@ -127,17 +127,49 @@ pub const GET_DECLAIRED_FIELDS_OF_JVM_CLASS: u32 = 109;
 ///
 /// Register 4: JVM Object id (must be a valid Class)
 ///
-/// Register 2: JVM Object id of fields array
-/// Register 3: Length of fields array.
+/// Register 2: JVM Object id of methods array
+/// Register 3: Length of methods array.
 pub const GET_DECLAIRED_METHODS_OF_JVM_CLASS: u32 = 110;
 
 /// Get an array of declaired constructors defined in the class
 ///
 /// Register 4: JVM Object id (must be a valid Class)
 ///
-/// Register 2: JVM Object id of fields array
-/// Register 3: Length of fields array.
+/// Register 2: JVM Object id of constructor array
+/// Register 3: Length of constructor array.
 pub const GET_DECLAIRED_CONSTRUCTORS_OF_JVM_CLASS: u32 = 111;
+
+/// Create a new object array
+/// 
+/// Register 4: Length of array to create
+/// 
+/// Register 2 JVM Object id of array
+pub const CREATE_NEW_OBJECT_ARRAY: u32 = 112;
+
+/// Take the Object in the Object array and replace it with null
+/// 
+/// Register 4: JVM Object id of array
+/// Register 5: Index into array
+/// 
+/// Register 2: JVM Object id of item in array
+pub const TAKE_OBJECT_AT_INDEX: u32 = 113;
+
+/// Put Object into Object array
+/// 
+/// Register 4: JVM Object id of array
+/// Register 5: Index into array
+/// Register 6: JVM Object to put into array
+pub const PUT_OBJECT_AT_INDEX: u32 = 114;
+
+
+
+
+
+
+
+
+
+
 
 /// Create a new JVM objest
 ///
