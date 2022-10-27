@@ -123,6 +123,22 @@ pub const MOVE_INTO_NAITIVE_ARRAY: u32 = 108;
 /// Register 3: Length of fields array.
 pub const GET_DECLAIRED_FIELDS_OF_JVM_CLASS: u32 = 109;
 
+/// Get an array of declaired methods defined in the class
+///
+/// Register 4: JVM Object id (must be a valid Class)
+///
+/// Register 2: JVM Object id of fields array
+/// Register 3: Length of fields array.
+pub const GET_DECLAIRED_METHODS_OF_JVM_CLASS: u32 = 110;
+
+/// Get an array of declaired constructors defined in the class
+///
+/// Register 4: JVM Object id (must be a valid Class)
+///
+/// Register 2: JVM Object id of fields array
+/// Register 3: Length of fields array.
+pub const GET_DECLAIRED_CONSTRUCTORS_OF_JVM_CLASS: u32 = 111;
+
 /// Create a new JVM objest
 ///
 /// Register 2: JVM Object id of Turtle

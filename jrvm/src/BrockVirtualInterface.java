@@ -237,13 +237,23 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
 
 
             case 110:
-            {
-                Field field = (Field)this.get_object(emu.registers[4]);
-
-//                emu.registers[2] = id;
-//                emu.registers[3] = fields.length;
-            }
-            break;
+                {
+                    Class clazz = (Class)this.get_object(emu.registers[4]);
+                    Method[] fields = clazz.getDeclaredMethods();
+                    int id = this.insert_object(fields);
+                    emu.registers[2] = id;
+                    emu.registers[3] = fields.length;
+                }
+                break;
+            case 111:
+                {
+                    Class clazz = (Class)this.get_object(emu.registers[4]);
+                    Constructor[] fields = clazz.getDeclaredConstructors();
+                    int id = this.insert_object(fields);
+                    emu.registers[2] = id;
+                    emu.registers[3] = fields.length;
+                }
+                break;
 
             // Turtle specific things
             case 200:

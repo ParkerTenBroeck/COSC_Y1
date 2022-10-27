@@ -104,6 +104,7 @@ public class Main {
         });
         t.start();
 
+
         basicForm.setTitle("My Window now :)");
 
         JRootPane root_pane = (JRootPane) frame.getComponent(0);

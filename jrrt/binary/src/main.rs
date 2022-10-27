@@ -13,60 +13,54 @@ pub mod panic_handler;
 
 extern crate libm;
 
-
-enum IdkWhat<D, const N:usize = 5>{
-    Local{
-        local: [Option<D>; N]
-    },
-    Vec{
-        non_local: Vec<D>
-    }
+enum IdkWhat<D, const N: usize = 5> {
+    Local { local: [Option<D>; N] },
+    Vec { non_local: Vec<D> },
 }
 
-impl<D: Copy, const N:usize> IdkWhat<D, N>{
-    pub fn new() -> Self{
+impl<D: Copy, const N: usize> IdkWhat<D, N> {
+    pub fn new() -> Self {
         Self::Local { local: [None; N] }
     }
 
-    pub fn len(&self) -> usize{
-        match self{
-            IdkWhat::Local { local } => local.iter().filter(|o|o.is_some()).count(),
+    pub fn len(&self) -> usize {
+        match self {
+            IdkWhat::Local { local } => local.iter().filter(|o| o.is_some()).count(),
             IdkWhat::Vec { non_local } => non_local.len(),
         }
     }
 
-    pub fn push(&mut self, data: D){
-        match self{
+    pub fn push(&mut self, data: D) {
+        match self {
             IdkWhat::Local { local } => {
-                for next in local.iter_mut(){
-                    if next.is_none(){
+                for next in local.iter_mut() {
+                    if next.is_none() {
                         *next = Some(data);
                         return;
                     }
                 }
                 let mut vec = Vec::new();
-                for next in (*local).into_iter(){
-                    if let Some(next) = next{
+                for next in (*local).into_iter() {
+                    if let Some(next) = next {
                         vec.push(next);
-                    }else{
+                    } else {
                         break;
                     }
                 }
                 *self = Self::Vec { non_local: vec };
-            },
+            }
             IdkWhat::Vec { ref mut non_local } => {
-                    non_local.push(data);
-            },
+                non_local.push(data);
+            }
         }
     }
 
-    pub fn new_with(data: D) -> Self{
+    pub fn new_with(data: D) -> Self {
         let mut new = Self::new();
         new.push(data);
         new
     }
 }
-
 
 enum Node<D> {
     Leaf(IdkWhat<D>),
@@ -78,7 +72,7 @@ enum Node<D> {
     },
 }
 
-impl<D: Copy> Node<D>{
+impl<D: Copy> Node<D> {
     pub fn is_leaf(&self) -> bool {
         matches!(self, Node::Leaf(_))
     }
@@ -88,30 +82,23 @@ impl<D: Copy> Node<D>{
     }
 
     pub fn push_data(&mut self, data: D) {
-        match self{
-            Node::Leaf(sv) => {
-                
-            },
-            Node::QUad { tl, tr, bl, br } => {
-
-            },
+        match self {
+            Node::Leaf(sv) => {}
+            Node::QUad { tl, tr, bl, br } => {}
         }
     }
 }
-
 
 struct BinaryTreeIsh {
     tree: Option<Node<Vector>>,
 }
 
-struct Compare2D{
+struct Compare2D {
     x: core::cmp::Ordering,
-    y: core::cmp::Ordering
+    y: core::cmp::Ordering,
 }
 
-impl Compare2D{
-    
-}
+impl Compare2D {}
 
 #[derive(Clone, Copy, PartialEq, PartialOrd)]
 struct Vector {
@@ -119,16 +106,15 @@ struct Vector {
     pub y: f32,
 }
 
-
 impl BinaryTreeIsh {
     pub fn new() -> Self {
         Self { tree: None }
     }
 
     pub fn push(&mut self, new_data: Vector) {
-        if let Some(tree) = &mut self.tree{
+        if let Some(tree) = &mut self.tree {
             tree.push_data(new_data);
-        }else{
+        } else {
             self.tree = Some(Node::new_leaf(new_data));
         }
     }
@@ -137,15 +123,25 @@ impl BinaryTreeIsh {
 #[no_mangle]
 pub fn main() {
     let mut screen = interface::screen::Screen::new();
-    
-    lazy_static::lazy_static! {
-        static ref OBJECT: interface::nji::Class = {
-            //interface::nji::Class::new("");
-            panic!();
-        };
-    }
 
-    
+    // lazy_static::lazy_static! {
+    //     static ref OBJECT: interface::nji::Class = {
+    //         //interface::nji::Class::new("");
+    //         panic!();
+    //     };
+    // }
+    let turtle = interface::brock_interface::TurtleRef::new();
+    //let display = interface::brock_interface::TurtleDisplayerRef::new_with_turtle(&mut turtle);
+    let class = turtle.get_class();
+    println!("{:#?}", class.get_fields());
+    println!("{:#?}", class.get_methods());
+    println!("{:#?}", class.get_constructor());
+    //turtle.forward(100.0);
+    //display.close();
+
+    if true {
+        panic!();
+    }
 
     loop {
         use screen::ScreenCommand::*;
@@ -157,8 +153,6 @@ pub fn main() {
             interface::sys::halt();
         }
     }
-
-    
 
     macros::java! {
     ASD SD s ss

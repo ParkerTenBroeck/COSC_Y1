@@ -1,61 +1,59 @@
-use crate::nji::object::Object;
+use crate::nji::object::ObjectRef;
 use crate::sys::*;
 
-pub struct Turtle(Object);
+pub struct Turtle;
+pub type TurtleRef = ObjectRef<Turtle>;
 
-impl Turtle {
+impl TurtleRef {
     pub fn new() -> Self {
-        unsafe { Self(Object::new_p(syscall_0_1::<CREATE_TURTLE>())) }
+        unsafe { Self::from_id_bits(syscall_0_1::<CREATE_TURTLE>()) }
     }
 
     pub fn set_speed(&mut self, speed: i32) {
-        unsafe { syscall_2_0::<SET_TURTLE_SPEED>(self.0.id_bits(), speed as u32) }
+        unsafe { syscall_2_0::<SET_TURTLE_SPEED>(self.id_bits(), speed as u32) }
     }
 
     pub fn pen_down(&mut self) {
-        unsafe { syscall_1_0::<TURTLE_PEN_DOWN>(self.0.id_bits()) }
+        unsafe { syscall_1_0::<TURTLE_PEN_DOWN>(self.id_bits()) }
     }
 
     pub fn pen_up(&mut self) {
-        unsafe { syscall_1_0::<TURTLE_PEN_UP>(self.0.id_bits()) }
+        unsafe { syscall_1_0::<TURTLE_PEN_UP>(self.id_bits()) }
     }
 
     pub fn forward(&mut self, pixels: f64) {
-        unsafe { syscall_3_0_1s::<TURTLE_FORWARD>(self.0.id_bits(), pixels.to_bits()) }
+        unsafe { syscall_3_0_1s::<TURTLE_FORWARD>(self.id_bits(), pixels.to_bits()) }
     }
 
     pub fn left(&mut self, pixels: f64) {
-        unsafe { syscall_3_0_1s::<TURTLE_LEFT>(self.0.id_bits(), pixels.to_bits()) }
+        unsafe { syscall_3_0_1s::<TURTLE_LEFT>(self.id_bits(), pixels.to_bits()) }
     }
 
     pub fn right(&mut self, pixels: f64) {
-        unsafe { syscall_3_0_1s::<TURTLE_RIGHT>(self.0.id_bits(), pixels.to_bits()) }
-    }
-
-    pub fn obj_mut(&mut self) -> &Object {
-        &mut self.0
+        unsafe { syscall_3_0_1s::<TURTLE_RIGHT>(self.id_bits(), pixels.to_bits()) }
     }
 }
 
-impl Default for Turtle {
+impl Default for TurtleRef {
     fn default() -> Self {
         Self::new()
     }
 }
 
-pub struct TurtleDisplayer(Object);
+pub struct TurtleDisplayer;
+pub type TurtleDisplayerRef = ObjectRef<TurtleDisplayer>;
 
-impl TurtleDisplayer {
+impl TurtleDisplayerRef {
     #[inline(always)]
-    pub fn new_with_turtle(turtle: &mut Turtle) -> Self {
+    pub fn new_with_turtle(turtle: &mut TurtleRef) -> Self {
         unsafe {
-            Self(Object::new_p(syscall_1_1::<
-                CREATE_TURTLE_DISPLAY_WITH_TURTLE,
-            >(turtle.0.id_bits())))
+            Self::from_id_bits(syscall_1_1::<CREATE_TURTLE_DISPLAY_WITH_TURTLE>(
+                turtle.id_bits(),
+            ))
         }
     }
 
     pub fn close(self) {
-        unsafe { syscall_1_0::<CLOSE_TURTLE_DISPLAYER>(self.0.id_bits()) }
+        unsafe { syscall_1_0::<CLOSE_TURTLE_DISPLAYER>(self.id_bits()) }
     }
 }

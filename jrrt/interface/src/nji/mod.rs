@@ -1,15 +1,15 @@
-use core::{fmt::Display, num::NonZeroU32};
+use core::num::NonZeroU32;
 
 extern crate alloc;
 
-use alloc::{string::String, vec::Vec};
+use alloc::vec::Vec;
 
 use crate::sys::*;
 
-pub mod object;
+pub mod class;
 pub mod jstring;
+pub mod object;
 use object::*;
-use jstring::*;
 
 // -----------------------------------------------------
 
@@ -24,7 +24,7 @@ impl ObjectArray {
     }
 
     pub fn id(&self) -> NonZeroU32 {
-        self.0.0
+        self.0 .0
     }
 
     pub fn len(&self) -> usize {
@@ -64,22 +64,17 @@ impl ObjectArray {
     }
 }
 
+// -----------------------------------------------------
 
 // -----------------------------------------------------
 
+pub struct Method;
+pub type MethodRef = ObjectRef<Method>;
 
 
-// -----------------------------------------------------
+pub struct Field;
+pub type FieldRef = ObjectRef<Field>;
 
-pub struct Method(Object);
-pub struct Field(Object);
 
-impl Field {}
-
-impl Display for Field {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
-pub struct Constructor(Object);
+pub struct Constructor;
+pub type ConstructorRef = ObjectRef<Constructor>;
