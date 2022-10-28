@@ -55,14 +55,21 @@ impl<T> ObjectRef<T> {
     ///
     /// Must be a valid obj_id
     pub unsafe fn from_id_bits(obj_id: u32) -> Option<Self> {
-        if let Some(obj_id) = NonZeroU32::new(obj_id){
+        if let Some(obj_id) = NonZeroU32::new(obj_id) {
             Some(Self(Object::new(obj_id), PhantomData))
-        }else{
+        } else {
             None
         }
     }
 
-    pub fn to_obj_ref(self) -> ObjectRef<Object>{
+    /// # Safety
+    ///
+    /// Must be a valid obj_id
+    pub unsafe fn from_id_bits_unchecked(obj_id: u32) -> Self {
+        Self(Object::new(NonZeroU32::new_unchecked(obj_id)), PhantomData)
+    }
+
+    pub fn to_obj_ref(self) -> ObjectRef<Object> {
         ObjectRef(self.0, PhantomData)
     }
 
@@ -72,14 +79,14 @@ impl<T> ObjectRef<T> {
 
     pub fn get_class(&self) -> ClassRef {
         unsafe {
-            let obj = Object::new_p(syscall_1_1::<GET_OBJECT_CLASS>(self.id_bits()));
+            let obj = Object::new_p(syscall_s_s::<GET_OBJECT_CLASS>(self.id_bits()));
             ClassRef::from_obj(obj)
         }
     }
 
     pub fn to_naitive_string(&self) -> String {
         unsafe {
-            let (str_id, len) = syscall_1_2::<JVM_OBJECT_TO_STRING>(self.id_bits());
+            let (str_id, len) = syscall_s_ss::<JVM_OBJECT_TO_STRING>(self.id_bits());
             let str = JStringRef::from_id_bits(str_id).unwrap();
             str.into_naitive_string_with_capacity(len as usize)
         }
@@ -104,51 +111,48 @@ impl<T> Debug for ObjectRef<T> {
 impl Drop for Object {
     fn drop(&mut self) {
         unsafe {
-            syscall_1_0::<FREE_JVM_OBJECT>(self.0.try_into().unwrap());
+            syscall_s_v::<FREE_JVM_OBJECT>(self.0.try_into().unwrap());
         }
     }
 }
-
 
 pub struct ObjectArray<T>(PhantomData<T>);
 
 pub type ObjectArrayRef<T> = ObjectRef<ObjectArray<T>>;
 
-impl<T> ObjectArrayRef<T>{
-
-    pub fn new(length: usize) -> Self{
-        unsafe{
-            Self::from_id_bits(
-                syscall_1_1::<CREATE_NEW_OBJECT_ARRAY>(length as u32)
-            ).unwrap()
+impl<T> ObjectArrayRef<T> {
+    pub fn new(length: usize) -> Self {
+        unsafe {
+            Self::from_id_bits(syscall_s_s::<CREATE_NEW_OBJECT_ARRAY>(length as u32)).unwrap()
         }
     }
 
-    pub fn from_vec(vec: Vec<ObjectRef<T>>) -> Self{
+    pub fn from_vec(vec: Vec<ObjectRef<T>>) -> Self {
         let mut new = Self::new(vec.len());
-        for (index, item) in vec.into_iter().enumerate(){
+        for (index, item) in vec.into_iter().enumerate() {
             new.put_item(index, item)
         }
         new
     }
 
-    /// Items will not be shifted but simply
-    pub fn remove_item(&mut self, index: usize) -> Option<ObjectRef<T>>{
-        unsafe{
-            ObjectRef::from_id_bits(
-                syscall_2_1::<TAKE_OBJECT_AT_INDEX>(self.id_bits(), index as u32)
-            )
+    /// Items will not be shifted but simply replaced with a null
+    pub fn remove_item(&mut self, index: usize) -> Option<ObjectRef<T>> {
+        unsafe {
+            ObjectRef::from_id_bits(syscall_ss_s::<TAKE_OBJECT_AT_INDEX>(
+                self.id_bits(),
+                index as u32,
+            ))
         }
     }
 
-    pub fn put_item(&mut self, index: usize, item: ObjectRef<T>){
-        unsafe{
-            syscall_3_0::<PUT_OBJECT_AT_INDEX>(self.id_bits(),index as u32, item.id_bits())
+    pub fn put_item(&mut self, index: usize, item: ObjectRef<T>) {
+        unsafe {
+            syscall_sss_v::<PUT_OBJECT_AT_INDEX>(self.id_bits(), index as u32, item.id_bits())
         }
     }
 
     pub fn len(&self) -> usize {
-        unsafe { syscall_1_1::<JVM_ARRAY_LENGTH>(self.0.id_bits()) as usize }
+        unsafe { syscall_s_s::<JVM_ARRAY_LENGTH>(self.0.id_bits()) as usize }
     }
 
     pub fn is_empty(&self) -> bool {
@@ -162,7 +166,7 @@ impl<T> ObjectArrayRef<T>{
         let ptr = ptr.addr();
         unsafe {
             let len =
-                syscall_3_1::<MOVE_INTO_NAITIVE_ARRAY>(self.id_bits(), ptr as u32, len as u32);
+                syscall_sss_s::<MOVE_INTO_NAITIVE_ARRAY>(self.id_bits(), ptr as u32, len as u32);
             vec.set_len(len as usize);
             vec
         }
@@ -173,7 +177,7 @@ impl<T> ObjectArrayRef<T>{
         let ptr: *mut ObjectRef<T> = vec.as_mut_ptr();
         let ptr = ptr.addr();
         unsafe {
-            let len = syscall_3_1::<MOVE_INTO_NAITIVE_ARRAY>(
+            let len = syscall_sss_s::<MOVE_INTO_NAITIVE_ARRAY>(
                 self.id_bits(),
                 ptr as u32,
                 capacity as u32,

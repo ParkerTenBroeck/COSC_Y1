@@ -2,7 +2,7 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 
-use crate::sys::{syscall_0_2, syscall_2_0, SCREEN_WIDTH_HEIGHT, SEND_MAIN_SCREEN_DRAW_CALL};
+use crate::sys::{syscall_ss_v, syscall_v_ss, SCREEN_WIDTH_HEIGHT, SEND_MAIN_SCREEN_DRAW_CALL};
 
 #[derive(Default, Clone, Copy)]
 pub struct ScreeenPoint {
@@ -354,7 +354,7 @@ impl Screen {
     pub fn send_draw_call(&mut self) {
         let ptr = self.call_data.as_ptr().addr() as u32;
         let len = self.call_data.len() as u32;
-        unsafe { syscall_2_0::<SEND_MAIN_SCREEN_DRAW_CALL>(ptr, len) }
+        unsafe { syscall_ss_v::<SEND_MAIN_SCREEN_DRAW_CALL>(ptr, len) }
         self.call_data.clear()
     }
 
@@ -365,7 +365,7 @@ impl Screen {
 
 pub fn get_screen_width_height() -> (i16, i16) {
     unsafe {
-        let (width, height) = syscall_0_2::<SCREEN_WIDTH_HEIGHT>();
+        let (width, height) = syscall_v_ss::<SCREEN_WIDTH_HEIGHT>();
         (width as i16, height as i16)
     }
 }

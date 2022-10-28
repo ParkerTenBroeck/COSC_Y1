@@ -140,40 +140,52 @@ pub const GET_DECLAIRED_METHODS_OF_JVM_CLASS: u32 = 110;
 pub const GET_DECLAIRED_CONSTRUCTORS_OF_JVM_CLASS: u32 = 111;
 
 /// Create a new object array
-/// 
+///
 /// Register 4: Length of array to create
-/// 
+///
 /// Register 2 JVM Object id of array
 pub const CREATE_NEW_OBJECT_ARRAY: u32 = 112;
 
 /// Take the Object in the Object array and replace it with null
-/// 
+///
 /// Register 4: JVM Object id of array
 /// Register 5: Index into array
-/// 
+///
 /// Register 2: JVM Object id of item in array
 pub const TAKE_OBJECT_AT_INDEX: u32 = 113;
 
 /// Put Object into Object array
-/// 
+///
 /// Register 4: JVM Object id of array
 /// Register 5: Index into array
 /// Register 6: JVM Object to put into array
 pub const PUT_OBJECT_AT_INDEX: u32 = 114;
 
-
-
 /// Get class from name
-/// 
+///
 /// Register 4: Ptr to start of str
 /// Register 5: length of str
+///
+/// Register 2: A JVM Object id of a class object, or zero if the class doesnt exist
 pub const CLASS_FOR_NAME: u32 = 115;
 
+pub const CREATE_JVM_BOOLEAN: u32 = 150;
+pub const CREATE_JVM_BYTE: u32 = 151;
+pub const CREATE_JVM_SHORT: u32 = 152;
+pub const CREATE_JVM_CHAR: u32 = 153;
+pub const CREATE_JVM_INTEGER: u32 = 154;
+pub const CREATE_JVM_LONG: u32 = 155;
+pub const CREATE_JVM_FLOAT: u32 = 156;
+pub const CREATE_JVM_DOUBLE: u32 = 157;
 
-
-
-
-
+pub const GET_JVM_BOOLEAN: u32 = 158;
+pub const GET_JVM_BYTE: u32 = 159;
+pub const GET_JVM_SHORT: u32 = 160;
+pub const GET_JVM_CHAR: u32 = 161;
+pub const GET_JVM_INTEGER: u32 = 162;
+pub const GET_JVM_LONG: u32 = 163;
+pub const GET_JVM_FLOAT: u32 = 164;
+pub const GET_JVM_DOUBLE: u32 = 165;
 
 /// Create a new JVM objest
 ///
@@ -256,7 +268,7 @@ pub const SCREEN_WIDTH_HEIGHT: u32 = 402;
 #[inline(always)]
 pub fn halt() -> ! {
     unsafe {
-        syscall_0_0::<HALT>();
+        syscall_v_v::<HALT>();
     }
 
     unsafe {
@@ -267,19 +279,19 @@ pub fn halt() -> ! {
 #[inline(always)]
 pub fn print_i32(num: i32) {
     unsafe {
-        syscall_1_0::<PRINT_DEC_NUMBER>(num as u32);
+        syscall_s_v::<PRINT_DEC_NUMBER>(num as u32);
     }
 }
 
 #[inline(always)]
 pub fn get_instructions_ran() -> u64 {
-    unsafe { syscall_0_2_s::<GET_INSTRUCTIONS_RAN>() }
+    unsafe { syscall_v_d::<GET_INSTRUCTIONS_RAN>() }
 }
 
 #[inline(always)]
 pub fn print_zero_term_str(str: &str) {
     unsafe {
-        syscall_1_0::<GET_INSTRUCTIONS_RAN>(str.as_ptr().addr() as u32);
+        syscall_s_v::<GET_INSTRUCTIONS_RAN>(str.as_ptr().addr() as u32);
     }
 }
 
@@ -293,31 +305,31 @@ pub fn print_str(str: &str) {
 #[inline(always)]
 pub fn print_char(char: char) {
     unsafe {
-        syscall_1_0::<PRINT_CHAR>(char as u32);
+        syscall_s_v::<PRINT_CHAR>(char as u32);
     }
 }
 
 #[inline(always)]
 pub fn sleep_ms(ms: u32) {
     unsafe {
-        syscall_1_0::<SLEEP_MS>(ms);
+        syscall_s_v::<SLEEP_MS>(ms);
     }
 }
 
 #[inline(always)]
 pub fn sleep_d_ms(ms: u32) {
     unsafe {
-        syscall_1_0::<SLEEP_D_MS>(ms);
+        syscall_s_v::<SLEEP_D_MS>(ms);
     }
 }
 
 #[inline(always)]
 pub fn current_time_nanos() -> u64 {
-    unsafe { syscall_0_2_s::<CURRENT_TIME_NANOS>() }
+    unsafe { syscall_v_d::<CURRENT_TIME_NANOS>() }
 }
 
 pub fn is_key_pressed(char: char) -> bool {
-    unsafe { syscall_1_1::<IS_KEY_PRESSED>(char as u32) != 0 }
+    unsafe { syscall_s_s::<IS_KEY_PRESSED>(char as u32) != 0 }
 }
 
 // #[inline(always)]
@@ -326,7 +338,7 @@ pub fn is_key_pressed(char: char) -> bool {
 // }
 
 pub fn rand_range(min: i32, max: i32) -> i32 {
-    unsafe { syscall_2_1::<GENERATE_THREAD_RANDOM_NUMBER>(min as u32, max as u32) as i32 }
+    unsafe { syscall_ss_s::<GENERATE_THREAD_RANDOM_NUMBER>(min as u32, max as u32) as i32 }
 }
 
 // #[inline(always)]
@@ -354,13 +366,12 @@ pub fn rand_range(min: i32, max: i32) -> i32 {
 // }
 
 //--------------------------------------------------------------
-
 /// # Safety
 ///
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_0_0<const CALL_ID: u32>() {
+pub unsafe fn syscall_v_v<const CALL_ID: u32>() {
     asm!(
         "syscall {0}",
         const(CALL_ID),
@@ -372,7 +383,7 @@ pub unsafe fn syscall_0_0<const CALL_ID: u32>() {
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_1_0<const CALL_ID: u32>(arg1: u32) {
+pub unsafe fn syscall_s_v<const CALL_ID: u32>(arg1: u32) {
     asm!(
         "syscall {0}",
         const(CALL_ID),
@@ -385,7 +396,7 @@ pub unsafe fn syscall_1_0<const CALL_ID: u32>(arg1: u32) {
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_0_1<const CALL_ID: u32>() -> u32 {
+pub unsafe fn syscall_v_s<const CALL_ID: u32>() -> u32 {
     let ret1;
     asm!(
         "syscall {0}",
@@ -400,7 +411,7 @@ pub unsafe fn syscall_0_1<const CALL_ID: u32>() -> u32 {
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_0_2<const CALL_ID: u32>() -> (u32, u32) {
+pub unsafe fn syscall_v_ss<const CALL_ID: u32>() -> (u32, u32) {
     let ret1;
     let ret2;
     asm!(
@@ -417,7 +428,24 @@ pub unsafe fn syscall_0_2<const CALL_ID: u32>() -> (u32, u32) {
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_1_1<const CALL_ID: u32>(arg1: u32) -> u32 {
+pub unsafe fn syscall_v_d<const CALL_ID: u32>() -> u64 {
+    let v0: u32;
+    let v1: u32;
+    asm!(
+        "syscall {0}",
+        const(CALL_ID),
+        lateout("$2") v0,
+        lateout("$3") v1,
+    );
+    ((v0 as u64) << 32) | (v1 as u64)
+}
+
+/// # Safety
+///
+/// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
+/// incorrectly can break pretty much anything.
+#[inline(always)]
+pub unsafe fn syscall_s_s<const CALL_ID: u32>(arg1: u32) -> u32 {
     let ret1;
     asm!(
         "syscall {0}",
@@ -433,7 +461,7 @@ pub unsafe fn syscall_1_1<const CALL_ID: u32>(arg1: u32) -> u32 {
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_1_2<const CALL_ID: u32>(arg1: u32) -> (u32, u32) {
+pub unsafe fn syscall_s_ss<const CALL_ID: u32>(arg1: u32) -> (u32, u32) {
     let ret1;
     let ret2;
     asm!(
@@ -451,7 +479,25 @@ pub unsafe fn syscall_1_2<const CALL_ID: u32>(arg1: u32) -> (u32, u32) {
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_2_0<const CALL_ID: u32>(arg1: u32, arg2: u32) {
+pub unsafe fn syscall_s_d<const CALL_ID: u32>(arg1: u32) -> u64 {
+    let v0: u32;
+    let v1: u32;
+    asm!(
+        "syscall {0}",
+        const(CALL_ID),
+        in("$4") arg1,
+        lateout("$2") v0,
+        lateout("$3") v1,
+    );
+    ((v1 as u64) << 32) | (v0 as u64)
+}
+
+/// # Safety
+///
+/// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
+/// incorrectly can break pretty much anything.
+#[inline(always)]
+pub unsafe fn syscall_ss_v<const CALL_ID: u32>(arg1: u32, arg2: u32) {
     asm!(
         "syscall {0}",
         const(CALL_ID),
@@ -465,7 +511,42 @@ pub unsafe fn syscall_2_0<const CALL_ID: u32>(arg1: u32, arg2: u32) {
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_3_0<const CALL_ID: u32>(arg1: u32, arg2: u32, arg3: u32) {
+pub unsafe fn syscall_d_v<const CALL_ID: u32>(arg1: u64) {
+    let a0 = (arg1 >> 32) as u32;
+    let a1 = arg1 as u32;
+    asm!(
+        "syscall {0}",
+        const(CALL_ID),
+        in("$4") a0,
+        in("$5") a1,
+    );
+}
+
+/// # Safety
+///
+/// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
+/// incorrectly can break pretty much anything.
+#[inline(always)]
+pub unsafe fn syscall_d_s<const CALL_ID: u32>(arg1: u64) -> u32 {
+    let a0 = (arg1 >> 32) as u32;
+    let a1 = arg1 as u32;
+    let ret;
+    asm!(
+        "syscall {0}",
+        const(CALL_ID),
+        in("$4") a0,
+        in("$5") a1,
+        out("$2") ret,
+    );
+    ret
+}
+
+/// # Safety
+///
+/// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
+/// incorrectly can break pretty much anything.
+#[inline(always)]
+pub unsafe fn syscall_sss_v<const CALL_ID: u32>(arg1: u32, arg2: u32, arg3: u32) {
     asm!(
         "syscall {0}",
         const(CALL_ID),
@@ -480,7 +561,7 @@ pub unsafe fn syscall_3_0<const CALL_ID: u32>(arg1: u32, arg2: u32, arg3: u32) {
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_3_1<const CALL_ID: u32>(arg1: u32, arg2: u32, arg3: u32) -> u32 {
+pub unsafe fn syscall_sss_s<const CALL_ID: u32>(arg1: u32, arg2: u32, arg3: u32) -> u32 {
     let ret1;
     asm!(
         "syscall {0}",
@@ -498,15 +579,17 @@ pub unsafe fn syscall_3_1<const CALL_ID: u32>(arg1: u32, arg2: u32, arg3: u32) -
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_3_0_1s<const CALL_ID: u32>(arg1: u32, arg2: u64) {
-    let arg_2 = arg2 as u32;
-    let arg_3 = (arg2 >> 32) as u32;
+pub unsafe fn syscall_ds_v<const CALL_ID: u32>(arg1: u64, arg2: u32) {
+    let a0 = (arg1 >> 32) as u32;
+    let a1 = arg1 as u32;
+    let a2 = arg2;
+    // let arg_2 = (arg2 >> 32) as u32;
     asm!(
         "syscall {0}",
         const(CALL_ID),
-        in("$4") arg1,
-        in("$5") arg_2,
-        in("$6") arg_3,
+        in("$4") a0,
+        in("$5") a1,
+        in("$6") a2,
     );
 }
 
@@ -515,7 +598,7 @@ pub unsafe fn syscall_3_0_1s<const CALL_ID: u32>(arg1: u32, arg2: u64) {
 /// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
 /// incorrectly can break pretty much anything.
 #[inline(always)]
-pub unsafe fn syscall_2_1<const CALL_ID: u32>(arg1: u32, arg2: u32) -> u32 {
+pub unsafe fn syscall_ss_s<const CALL_ID: u32>(arg1: u32, arg2: u32) -> u32 {
     let ret1;
     asm!(
         "syscall {0}",
@@ -525,21 +608,4 @@ pub unsafe fn syscall_2_1<const CALL_ID: u32>(arg1: u32, arg2: u32) -> u32 {
         out("$2") ret1,
     );
     ret1
-}
-
-/// # Safety
-///
-/// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
-/// incorrectly can break pretty much anything.
-#[inline(always)]
-pub unsafe fn syscall_0_2_s<const CALL_ID: u32>() -> u64 {
-    let tmp1: u32;
-    let tmp2: u32;
-    asm!(
-        "syscall {0}",
-        const(CALL_ID),
-        out("$2") tmp1,
-        out("$3") tmp2,
-    );
-    (tmp1 as u64) | ((tmp2 as u64) << 32)
 }

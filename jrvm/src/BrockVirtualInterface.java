@@ -292,9 +292,61 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                     }
                 }
                 break;
-            case 199:{
+            case 150:
+                emu.registers[2] = this.insert_object(emu.registers[4] != 0);
+                break;
+            case 151:
+                emu.registers[2] = this.insert_object((byte)emu.registers[4]);
+                break;
+            case 152:
+                emu.registers[2] = this.insert_object((short)emu.registers[4]);
+                break;
+            case 153:
+                emu.registers[2] = this.insert_object((char)emu.registers[4]);
+                break;
+            case 154:
+                emu.registers[2] = this.insert_object(emu.registers[4]);
+                break;
+            case 155:
+                emu.registers[2] = this.insert_object((0xFFFFFFFF & ((long)emu.registers[5])) | (((long)emu.registers[4]) << 32));
+                break;
+            case 156:
+                emu.registers[2] = this.insert_object(Float.intBitsToFloat(emu.registers[4]));
+                break;
+            case 157:
+                emu.registers[2] = this.insert_object(Double.longBitsToDouble((0xFFFFFFFF & ((long)emu.registers[5])) | (((long)emu.registers[4]) << 32)));
+                break;
 
-                //Main.class.getClassLoader().
+            case 158:
+                emu.registers[2] = (Boolean)this.get_object(emu.registers[4]) ? 1: 0;
+                break;
+            case 159:
+                emu.registers[2] = (Byte)this.get_object(emu.registers[4]);
+                break;
+            case 160:
+                emu.registers[2] = (Short)this.get_object(emu.registers[4]);
+                break;
+            case 161:
+                emu.registers[2] = (Character) this.get_object(emu.registers[4]);
+                break;
+            case 162:
+                emu.registers[2] = (Integer) this.get_object(emu.registers[4]);
+                break;
+            case 163:{
+                long v =  (Long) this.get_object(emu.registers[4]);
+                emu.registers[2] = (int)(v >> 32);
+                emu.registers[3] = (int)v;
+            }
+                break;
+            case 164:
+                emu.registers[2] = Float.floatToIntBits((Float)this.get_object(emu.registers[4]));
+                break;
+            case 165:{
+
+                double d =  (Double) this.get_object(emu.registers[4]);
+                long v = Double.doubleToLongBits(d);
+                emu.registers[2] = (int)(v >> 32);
+                emu.registers[3] = (int)v;
             }
             break;
 

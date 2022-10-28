@@ -1,5 +1,6 @@
 #![no_std]
 #![no_main]
+#![feature(concat_idents)]
 #![feature(lang_items)]
 #![feature(asm_experimental_arch)]
 #![feature(strict_provenance)]
