@@ -39,12 +39,35 @@ impl ClassRef {
         }
     }
 
-    pub fn get_constructor(&self) -> Vec<ConstructorRef> {
+    pub fn get_method(
+        &self,
+        name: &JStringRef,
+        parameters: ObjectArrayRef<Class>,
+    ) -> Option<MethodRef> {
+        unsafe {
+            MethodRef::from_id_bits(syscall_sss_s::<GET_CLASS_METHOD>(
+                self.id_bits(),
+                name.id_bits(),
+                parameters.id_bits(),
+            ))
+        }
+    }
+
+    pub fn get_constructors(&self) -> Vec<ConstructorRef> {
         unsafe {
             let (id, len) = syscall_s_ss::<GET_DECLAIRED_CONSTRUCTORS_OF_JVM_CLASS>(self.id_bits());
             let arr = ObjectArrayRef::from_id_bits(id).unwrap();
             let arr = arr.to_native_vec_with_capacity(len as usize);
             arr
+        }
+    }
+
+    pub fn get_constructor(&self, parameters: ObjectArrayRef<ClassRef>) -> Option<ConstructorRef> {
+        unsafe {
+            ConstructorRef::from_id_bits(syscall_ss_s::<GET_CLASS_CONSTRUCTOR>(
+                self.id_bits(),
+                parameters.id_bits(),
+            ))
         }
     }
 
@@ -54,6 +77,15 @@ impl ClassRef {
             let arr = ObjectArrayRef::from_id_bits(id).unwrap();
             let arr = arr.to_native_vec_with_capacity(len as usize);
             arr
+        }
+    }
+
+    pub fn get_field(&self, name: &JStringRef) -> Option<FieldRef> {
+        unsafe {
+            FieldRef::from_id_bits(syscall_ss_s::<GET_CLASS_FIELD>(
+                self.id_bits(),
+                name.id_bits(),
+            ))
         }
     }
 }

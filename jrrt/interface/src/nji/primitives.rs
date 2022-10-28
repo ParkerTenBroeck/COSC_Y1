@@ -1,11 +1,24 @@
 extern crate alloc;
 
+use super::class::ClassRef;
 use super::object::ObjectRef;
 use crate::sys::*;
 use alloc::string::String;
 
 pub struct JString;
 pub type JStringRef = ObjectRef<JString>;
+
+impl From<&str> for JStringRef {
+    fn from(str: &str) -> Self {
+        Self::from_naitive_str(str)
+    }
+}
+
+impl From<&String> for JStringRef {
+    fn from(str: &String) -> Self {
+        Self::from(str.as_str())
+    }
+}
 
 impl JStringRef {
     pub fn into_naitive_string(self) -> String {
@@ -18,6 +31,15 @@ impl JStringRef {
             string.as_mut_vec().set_len(len as usize);
 
             string
+        }
+    }
+
+    pub fn from_naitive_str(str: &str) -> Self {
+        unsafe {
+            Self::from_id_bits_unchecked(syscall_ss_s::<CREATE_JVM_STRING>(
+                str.as_ptr() as u32,
+                str.len() as u32,
+            ))
         }
     }
 
@@ -48,8 +70,8 @@ pub type JShortRef = ObjectRef<JShort>;
 pub struct JChar;
 pub type JCharRef = ObjectRef<JChar>;
 
-pub struct JInteger;
-pub type JIntegerRef = ObjectRef<JInteger>;
+pub struct JInt;
+pub type JIntRef = ObjectRef<JInt>;
 
 pub struct JFloat;
 pub type JFloatRef = ObjectRef<JFloat>;
@@ -108,6 +130,14 @@ macro_rules! auto_impls {
                     $into_rtype
                 }
             }
+
+            pub fn primitive_class() -> ClassRef {
+                unsafe {
+                    ClassRef::from_id_bits_unchecked(syscall_v_s::<
+                        concat_idents!(GET_JVM_, $jtype, _CLASS),
+                    >())
+                }
+            }
         }
 
         impl From<$rtype> for $refname {
@@ -128,7 +158,7 @@ auto_impls!(JBooleanRef, bool, BOOLEAN, res, res != 0);
 auto_impls!(JByteRef, i8, BYTE);
 auto_impls!(JShortRef, i16, SHORT);
 auto_impls!(JCharRef, char, CHAR, res, char::from_u32_unchecked(res));
-auto_impls!(JIntegerRef, i32, INTEGER);
+auto_impls!(JIntRef, i32, INT);
 auto_impls!(
     JLongRef,
     i64,

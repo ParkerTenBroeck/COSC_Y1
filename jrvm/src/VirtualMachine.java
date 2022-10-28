@@ -636,6 +636,7 @@ public class VirtualMachine {
             }catch (Exception ignore){
             }
             this.running = false;
+            throw e;
         }
     }
 

@@ -3,29 +3,71 @@
 #![feature(const_for)]
 #![feature(strict_provenance)]
 #![feature(default_alloc_error_handler)]
+#![feature(bench_black_box)]
 
-pub mod panic_handler;
 pub mod alloc;
-use interface::nji::{class::ClassRef, primitives::{JIntegerRef, JBooleanRef, JCharRef, JDoubleRef}};
+pub mod panic_handler;
+use core::{time::Duration, hint::black_box};
+
+use interface::nji::{
+    class::ClassRef,
+    object::ObjectArrayRef,
+    primitives::{JBooleanRef, JCharRef, JDoubleRef, JIntRef, JLongRef},
+};
 pub use interface::*;
 
 #[no_mangle]
 pub fn main() {
-    let int = JIntegerRef::new(54);
-    println!("{}", int);
-    let int = JCharRef::new('b');
-    println!("{}", int);
-    let int = JBooleanRef::new(false);
-    println!("{}", int);
-    let int = JDoubleRef::new(-54.2478378);
-    println!("{}", int);
-    let int = JIntegerRef::new(-54);
-    println!("{}", int);
-    let int = int.val();
-    println!("{}", int);
+    let mut vec = alloc::vec::Vec::new();
+    vec.push(JIntRef::new(54).to_obj_ref());
+    vec.push(JCharRef::new('b').to_obj_ref());
+    vec.push(JBooleanRef::new(false).to_obj_ref());
+    vec.push(JDoubleRef::new(-54.2478378).to_obj_ref());
+    vec.push(JLongRef::new(-54).to_obj_ref());
+    // println!("{:#?}", vec);
+    // let arr = ObjectArrayRef::from_vec(vec);
+    // println!("{}", arr);
+    let start = interface::sys::current_time_nanos();
+
+    let class = ClassRef::for_name("java.lang.Math").unwrap();
+    let method = class
+        .get_method(
+            &"fma".into(),
+            ObjectArrayRef::from_vec(alloc::vec![
+                JDoubleRef::primitive_class(),
+                JDoubleRef::primitive_class(),
+                JDoubleRef::primitive_class()
+            ]),
+        )
+        .unwrap();
+
+    let mut args = ObjectArrayRef::from_vec(alloc::vec![
+        JDoubleRef::new(2.0).to_obj_ref(),
+        JDoubleRef::new(4.0).to_obj_ref(),
+        JDoubleRef::new(6.0).to_obj_ref()
+    ]);
+
+    for _ in 0..50000{
+            
+        let ret = method.invoke_static(&mut args);
+        let ret = ret.unwrap().unwrap();
+        let ret = unsafe{JDoubleRef::from_obj_ref(ret)};
+        let ret = ret.val();
+        black_box(ret);
+        //println!("{ret}");
+    }
+    let end = interface::sys::current_time_nanos();
+    let dur = Duration::from_nanos(end - start);
+    println!("{:?}", dur);
+
+    // println!("method: {}", method);
+
+    println!("{:?}", JIntRef::primitive_class());
+    //println!("{:#?}",JIntRef::new(54).get_class().get_fields());
+    panic!();
 
     let class = ClassRef::for_name("java.lang.Integer").unwrap(); //turtle.get_class();
     println!("{:#?}", class.get_fields());
     println!("{:#?}", class.get_methods());
-    println!("{:#?}", class.get_constructor());
+    println!("{:#?}", class.get_constructors());
 }

@@ -65,7 +65,14 @@ pub const FREE_JVM_OBJECT: u32 = 100;
 ///
 /// Register 2: JVM Object id of class
 pub const GET_OBJECT_CLASS: u32 = 101;
-pub const GET_OBJECT_CLASS_2: u32 = 102;
+
+/// Construct a JVM String
+///
+/// Register 4: ptr to start of naitive str
+/// Register 5: len of string
+///
+/// Register 2: JVM id of String
+pub const CREATE_JVM_STRING: u32 = 102;
 
 /// Get the full name of the class
 ///
@@ -169,11 +176,46 @@ pub const PUT_OBJECT_AT_INDEX: u32 = 114;
 /// Register 2: A JVM Object id of a class object, or zero if the class doesnt exist
 pub const CLASS_FOR_NAME: u32 = 115;
 
+/// Get a declaired method in a class
+///
+/// Register 4: Class JVM Object id
+/// Register 5: String JVM Object id for method name
+/// Register 6: Class[] JVM Object id for parameters
+///
+/// Register 2: Method JVM Object id
+pub const GET_CLASS_METHOD: u32 = 116;
+
+/// Get a declaired constructor in a class
+///
+/// Register 4: Class JVM Object id
+/// Register 5: Class[] JVM Object id for parameters
+///
+/// Register 2: Constructor JVM Object id
+pub const GET_CLASS_CONSTRUCTOR: u32 = 117;
+
+/// Get a declaired field in a class
+///
+/// Register 4: Class JVM OBject id
+/// Register 5: String JVM Object id for field name
+///
+/// Register 2: Field JVM Object id
+pub const GET_CLASS_FIELD: u32 = 118;
+
+/// Invoke a method
+/// 
+/// Register 4: Method JVM Object id
+/// Register 5: Null or Object to invoke method on
+/// Register 6: Object[] JVM id for arguments
+/// 
+/// Register 2: return result Null or a valid object
+/// Register 3: If non zero an error occured and this is the JVM Object id of the error
+pub const INVOKE_METHOD: u32 = 119;
+
 pub const CREATE_JVM_BOOLEAN: u32 = 150;
 pub const CREATE_JVM_BYTE: u32 = 151;
 pub const CREATE_JVM_SHORT: u32 = 152;
 pub const CREATE_JVM_CHAR: u32 = 153;
-pub const CREATE_JVM_INTEGER: u32 = 154;
+pub const CREATE_JVM_INT: u32 = 154;
 pub const CREATE_JVM_LONG: u32 = 155;
 pub const CREATE_JVM_FLOAT: u32 = 156;
 pub const CREATE_JVM_DOUBLE: u32 = 157;
@@ -182,10 +224,19 @@ pub const GET_JVM_BOOLEAN: u32 = 158;
 pub const GET_JVM_BYTE: u32 = 159;
 pub const GET_JVM_SHORT: u32 = 160;
 pub const GET_JVM_CHAR: u32 = 161;
-pub const GET_JVM_INTEGER: u32 = 162;
+pub const GET_JVM_INT: u32 = 162;
 pub const GET_JVM_LONG: u32 = 163;
 pub const GET_JVM_FLOAT: u32 = 164;
 pub const GET_JVM_DOUBLE: u32 = 165;
+
+pub const GET_JVM_BOOLEAN_CLASS: u32 = 166;
+pub const GET_JVM_BYTE_CLASS: u32 = 167;
+pub const GET_JVM_SHORT_CLASS: u32 = 168;
+pub const GET_JVM_CHAR_CLASS: u32 = 168;
+pub const GET_JVM_INT_CLASS: u32 = 170;
+pub const GET_JVM_LONG_CLASS: u32 = 171;
+pub const GET_JVM_FLOAT_CLASS: u32 = 172;
+pub const GET_JVM_DOUBLE_CLASS: u32 = 173;
 
 /// Create a new JVM objest
 ///
@@ -489,7 +540,7 @@ pub unsafe fn syscall_s_d<const CALL_ID: u32>(arg1: u32) -> u64 {
         lateout("$2") v0,
         lateout("$3") v1,
     );
-    ((v1 as u64) << 32) | (v0 as u64)
+    ((v0 as u64) << 32) | (v1 as u64)
 }
 
 /// # Safety
@@ -572,6 +623,26 @@ pub unsafe fn syscall_sss_s<const CALL_ID: u32>(arg1: u32, arg2: u32, arg3: u32)
         out("$2") ret1,
     );
     ret1
+}
+
+/// # Safety
+///
+/// If you have to read this then you shouldnt be using this. This is a raw System Call, using it
+/// incorrectly can break pretty much anything.
+#[inline(always)]
+pub unsafe fn syscall_sss_ss<const CALL_ID: u32>(arg1: u32, arg2: u32, arg3: u32) -> (u32, u32) {
+    let ret1;
+    let ret2;
+    asm!(
+        "syscall {0}",
+        const(CALL_ID),
+        in("$4") arg1,
+        in("$5") arg2,
+        in("$6") arg3,
+        out("$2") ret1,
+        out("$3") ret2,
+    );
+    (ret1, ret2)
 }
 
 /// # Safety

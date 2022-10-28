@@ -123,7 +123,7 @@ pub type ObjectArrayRef<T> = ObjectRef<ObjectArray<T>>;
 impl<T> ObjectArrayRef<T> {
     pub fn new(length: usize) -> Self {
         unsafe {
-            Self::from_id_bits(syscall_s_s::<CREATE_NEW_OBJECT_ARRAY>(length as u32)).unwrap()
+            Self::from_id_bits_unchecked(syscall_s_s::<CREATE_NEW_OBJECT_ARRAY>(length as u32))
         }
     }
 

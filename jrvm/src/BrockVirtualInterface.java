@@ -119,8 +119,8 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
             case 60:
                 {
                     long now = System.nanoTime();
-                    emu.registers[3] = (int)(now >> 32);
-                    emu.registers[2] = (int)now;
+                    emu.registers[2] = (int)(now >> 32);
+                    emu.registers[3] = (int)now;
                 }
                 break;
             case 99:
@@ -144,9 +144,13 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                 break;
             case 102:
                 {
-                    Class clazz = this.get_object(emu.registers[4]).getClass();
-                    int id = this.insert_object(clazz);
-                    emu.registers[2] = id;
+                    int ptr = emu.registers[4];
+                    int len = emu.registers[5];
+                    StringBuilder builder = new StringBuilder();
+                    for(int i = ptr; i < ptr + len; i++){
+                        builder.append((char)emu.getByte(i));
+                    }
+                    emu.registers[2] = this.insert_object(builder.toString());
                 }
                 break;
             case 103:
@@ -262,6 +266,7 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                     Object[] arr = new Object[len];
                     emu.registers[2] = this.insert_object(arr);
                 }
+            break;
             case 113:
                 {
                     Object[] arr = (Object[])this.get_object(emu.registers[4]);
@@ -292,6 +297,65 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                     }
                 }
                 break;
+
+            case 116:{
+                Class clazz = (Class)this.get_object(emu.registers[4]);
+                String name = (String)this.get_object(emu.registers[5]);
+                Class[] parameters = java.util.stream.Stream.of((Object[])this.get_object(emu.registers[6])).toArray(Class[]::new);
+                try{
+                    Method method = clazz.getMethod(name, parameters);;
+
+                    emu.registers[2] = this.insert_object(method);
+                }catch (Exception e){
+                    emu.registers[2] = 0;
+                }
+            }
+            break;
+            case 117:{
+                Class clazz = (Class)this.get_object(emu.registers[4]);
+                Class[] parameters = java.util.stream.Stream.of((Object[])this.get_object(emu.registers[5])).toArray(Class[]::new);
+                try{
+                    Constructor method = clazz.getConstructor(parameters);;
+                    emu.registers[2] = this.insert_object(method);
+                }catch (Exception e){
+                    emu.registers[2] = 0;
+                }
+            }
+            break;
+            case 118:{
+                Class clazz = (Class)this.get_object(emu.registers[4]);
+                String name = (String)this.get_object(emu.registers[5]);
+                try{
+                    Field method = clazz.getField(name);
+                    emu.registers[2] = this.insert_object(method);
+                }catch (Exception e){
+                    emu.registers[2] = 0;
+                }
+            }
+            break;
+            case 119:{
+                Method method = (Method)this.get_object(emu.registers[4]);
+                Object[] arguments = (Object[])this.get_object(emu.registers[6]);
+                try{
+                    Object ret;
+                    if (emu.registers[5] == 0){
+                        ret = method.invoke(null, arguments);
+                    }else{
+                        ret = method.invoke(this.get_object(emu.registers[5]), arguments);
+                    }
+                    if (ret == null){
+                        emu.registers[2] = 0;
+                    }else{
+                        emu.registers[2] = this.insert_object(ret);
+                    }
+                    emu.registers[3] = 0;
+                }catch (Exception e){
+                    emu.registers[2] = 0;
+                    emu.registers[3] = this.insert_object(e);
+                }
+            }
+            break;
+
             case 150:
                 emu.registers[2] = this.insert_object(emu.registers[4] != 0);
                 break;
@@ -349,6 +413,30 @@ public class BrockVirtualInterface implements VirtualMachine.VirtualInterface {
                 emu.registers[3] = (int)v;
             }
             break;
+            case 166:
+                emu.registers[2] = this.insert_object(boolean.class);
+                break;
+            case 167:
+                emu.registers[2] = this.insert_object(byte.class);
+                break;
+            case 168:
+                emu.registers[2] = this.insert_object(short.class);
+                break;
+            case 169:
+                emu.registers[2] = this.insert_object(char.class);
+                break;
+            case 170:
+                emu.registers[2] = this.insert_object(int.class);
+                break;
+            case 171:
+                emu.registers[2] = this.insert_object(long.class);
+                break;
+            case 172:
+                emu.registers[2] = this.insert_object(float.class);
+                break;
+            case 173:
+                emu.registers[2] = this.insert_object(double.class);
+                break;
 
             // Turtle specific things
             case 200:
