@@ -1,0 +1,12 @@
+#BlueJ class context
+comment0.target=Vivid
+comment0.text=\n\ @author\ Parker\ TenBroeck\ 7376726\n\ Assignment\ 4\n
+comment1.params=
+comment1.target=Vivid()
+comment2.params=pic
+comment2.target=void\ vividPicturePalette(Media.Picture)
+comment2.text=\n\ Make\ the\ provided\ Picture\ vivid\n\ \n\ @param\ pic\ \ \ the\ picture\ to\ make\ vivid\n
+comment3.params=original
+comment3.target=java.awt.Color\ vividPalette(java.awt.Color)
+comment3.text=\n\ \ Reduce\ the\ palette\ of\ a\ color\n\n\ @param\ \ original\ \ the\ color\ to\ preform\ palette\ reduction\ on\n\ @return\ \ \ a\ new\ color\ that\ is\ more\ 'vivid'\n
+numComments=4

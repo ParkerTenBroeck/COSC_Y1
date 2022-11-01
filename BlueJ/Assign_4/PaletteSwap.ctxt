@@ -1,0 +1,12 @@
+#BlueJ class context
+comment0.target=PaletteSwap
+comment0.text=\n\ @author\ Parker\ TenBroeck\ 7376726\n\ Assignment\ 4\n
+comment1.params=
+comment1.target=PaletteSwap()
+comment2.params=pic
+comment2.target=void\ recudePicturePalette(Media.Picture)
+comment2.text=\n\ Reduce\ the\ pallete\ of\ a\ whole\ image\n\ \n\ @param\ pic\ \ \ the\ picture\ to\ preform\ palette\ reduction\ on\n
+comment3.params=original
+comment3.target=java.awt.Color\ reducePalette(java.awt.Color)
+comment3.text=\n\ \ Reduce\ the\ palette\ of\ a\ color\n\n\ @param\ \ original\ \ the\ color\ to\ preform\ palette\ reduction\ on\n\ @return\ \ \ a\ new\ color\ that\ has\ a\ recuded\ palette\n
+numComments=4
