@@ -1,0 +1,24 @@
+#BlueJ class context
+comment0.target=Splotchy
+comment0.text=\n\ @author\ Parker\ TenBroeck\ 7376726\n\ Assignment\ 5\n
+comment1.params=
+comment1.target=Splotchy()
+comment2.params=pic\ splotches
+comment2.target=Media.Picture\ splotcherize(Media.Picture,\ int)
+comment2.text=\n\ Make\ a\ new\ image\ thats\ a\ splotchy\ version\ of\ pic\n\n\ @param\ pic\ \ \ \ \ \ \ \ the\ picture\ to\ base\ the\ new\ picture\ off\n\ @param\ splotches\ \ the\ number\ of\ splotches\ to\ make\n\ @return\ \ \ \ \ \ \ \ \ \ \ the\ new\ splotchy\ picture\n
+comment3.params=target\ color\ x\ y
+comment3.target=void\ drawSplotch(Media.Picture,\ java.awt.Color,\ int,\ int)
+comment3.text=\n\ Draw\ a\ splotch\ on\ target\ with\ color\ at\ x,y\n\ \n\ Note\:\ the\ splotch\ is\ not\ drawn\ starting\ from\ any\ corner\ but\n\ instead\ it\ is\ drawn\ such\ that\ x\ and\ y\ are\ inside\ the\ splotch\ and\n\ all\ of\ the\ splotch\ is\ visible\n\ \n\ @param\ target\ \ \ the\ target\ image\ to\ draw\ the\ splotch\ in\n\ @param\ color\ \ \ \ the\ color\ to\ make\ the\ splotch\n\ @param\ x\ \ \ \ \ \ \ \ the\ x\ coord\ where\ the\ splotch\ should\ -kinda-\ be\n\ @param\ y\ \ \ \ \ \ \ \ the\ y\ coord\ where\ the\ splotch\ should\ -kinda-\ be\n
+comment4.params=pic
+comment4.target=void\ blending(Media.Picture)
+comment4.text=\n\ Preform\ a\ blur\ effect\ on\ pic\ \n\ This\ methods\ preforms\ the\ bluring\ algorithm\ specified\ by\ the\ professor\n\ \n\ @param\ pic\ \ \ \ \ \ the\ picture\ to\ preform\ blending\ on\n\ @return\ \ \ \ \ \ \ \ \ a\ new\ picture\ made\ from\ blurring\ pic\n
+comment5.params=pic\ x\ y
+comment5.target=void\ blendAt(Media.Picture,\ int,\ int)
+comment5.text=\n\ Preforms\ blending\ on\ the\ pixel\ in\ a\ 7x7\ box\ around\ the\ anchor\ point\n\ Pixels\ out\ of\ bounds\ will\ not\ be\ drawn\ to\ \n\ \n\ @param\ pic\ \ \ the\ picture\ to\ preform\ the\ pixel\ blend\ on\n\ @param\ x\ \ \ \ \ the\ x\ coord\ of\ the\ anchor\ pixel\n\ @param\ y\ \ \ \ \ the\ y\ coord\ of\ the\ anchor\ pixel\n
+comment6.params=pic\ radius
+comment6.target=Media.Picture\ blending2(Media.Picture,\ int)
+comment6.text=\n\ Preform\ a\ blur\ effect\ on\ pic\ \n\ bluring\ with\ radius\ \n\ This\ method\ preforms\ a\ blur\ that\ takes\ into\ account\ the\ \n\ non\ linear\ color\ space\n\ \n\ @param\ pic\ \ \ \ \ \ the\ picture\ to\ preform\ blending\ on\n\ @param\ radius\ \ \ the\ radius\ of\ the\ blending\n\ @return\ \ \ \ \ \ \ \ \ a\ new\ picture\ made\ from\ blurring\ pic\n
+comment7.params=pic\ x\ y\ radius
+comment7.target=java.awt.Color\ calculateColorAverageWithinRadius(Media.Picture,\ int,\ int,\ int)
+comment7.text=\n\ This\ method\ will\ calculate\ the\ average\ color\ at\ x\ and\ y\ within\ a\ given\ radius\n\ in\ the\ picture\n\ \n\ @param\ pic\ \ \ \ the\ picture\ \n\ @param\ x\ \ \ \ \ \ the\ x\ coord\ of\ the\ center\ average\ point\n\ @param\ y\ \ \ \ \ \ the\ y\ coord\ of\ the\ center\ average\ point\n\ @param\ radius\ the\ radius\ around\ the\ center\ point\ to\ calculate\ the\ average\ color\n\ @return\ \ \ \ \ \ \ the\ average\ color\ calculated\n
+numComments=8

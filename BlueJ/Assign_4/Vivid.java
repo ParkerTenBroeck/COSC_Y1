@@ -21,8 +21,10 @@ public class Vivid
      * @param pic   the picture to make vivid
      */
     public static void vividPicturePalette(Picture pic) {
+        Pixel pixel;
         // for ever pixel in the image
-        for(Pixel pixel = pic.next(); pic.hasNext(); pixel = pic.next()){
+        while(pic.hasNext()){
+            pixel = pic.next();
             // get the pixels current color
             Color pixelColor = pixel.getColor();
             // transform the color according to the PDF

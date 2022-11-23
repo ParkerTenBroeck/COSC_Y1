@@ -1,3 +1,4 @@
+import BasicIO.ASCIIDisplayer;
 import BasicIO.BasicForm;
 import BasicIO.GeneralCanvas;
 import Media.Picture;
@@ -17,7 +18,6 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) throws Exception{
-
         Turtle yertle = new Turtle();
         TurtleDisplayer display = new TurtleDisplayer(yertle, 720, 480);
 
