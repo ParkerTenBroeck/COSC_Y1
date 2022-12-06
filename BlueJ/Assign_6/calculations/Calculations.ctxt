@@ -1,0 +1,12 @@
+#BlueJ class context
+comment0.target=Calculations
+comment0.text=\n\ @author\ Parker\ TenBroeck\ 7376726\n
+comment1.params=
+comment1.target=Calculations()
+comment2.params=file
+comment2.target=void\ calcFile(BasicIO.ASCIIDataFile)
+comment2.text=\n\ Parses\ the\ given\ ascii\ file\ and\ tabulates\ it\ using\ this\ instances\ tabulator\n\ \n\ @param\ file\ \ the\ file\ to\ parse\ and\ tabulate\n
+comment3.params=file
+comment3.target=int\ readRestOfFileLineAsInt(BasicIO.ASCIIDataFile)
+comment3.text=\n\ Reads\ an\ entire\ line\ from\ the\ given\ ascii\ file\ and\ parses\ it\ as\ an\ integer\n\ If\ the\ file\ has\ no\ more\ data\ or\ the\ line\ is\ not\ a\ valid\ integer\ an\ exception\ will\ occur\n\ \n\ @param\ file\ \ the\ file\ to\ read\ from\n\ \n\ @return\ the\ value\ parsed\ from\ the\ file\n
+numComments=4

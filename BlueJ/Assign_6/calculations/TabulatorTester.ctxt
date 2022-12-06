@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.target=TabulatorTester
+comment0.text=\n\ This\ program\ is\ provided\ as\ a\ VERY\ simple\ tester\ of\ a\ Tabulator.\n\ It\ displays\ a\ known\ pattern\ onto\ a\ TurtleGraphics\ canvas,\ that\ can\n\ be\ verified\ against\ the\ expected\ outcome.\n
+comment1.params=
+comment1.target=TabulatorTester()
+comment2.params=args
+comment2.target=void\ main(java.lang.String[])
+numComments=3
