@@ -1,3 +1,4 @@
+import BasicIO.ASCIIDataFile;
 import BasicIO.ASCIIDisplayer;
 import BasicIO.BasicForm;
 import BasicIO.GeneralCanvas;
@@ -20,7 +21,8 @@ public class Main {
     public static void main(String[] args) throws Exception{
         Turtle yertle = new Turtle();
         TurtleDisplayer display = new TurtleDisplayer(yertle, 720, 480);
-
+        ASCIIDataFile file = new ASCIIDataFile();
+        file.isEOF();
 
         yertle.penDown();
         yertle.right(Math.PI/2);
