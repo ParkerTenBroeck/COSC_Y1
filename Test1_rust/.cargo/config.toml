@@ -1,6 +1,6 @@
 [target.mips]
 rustflags = [
-"-C", "llvm-args=--help-list-hidden",
+#"-C", "llvm-args=--help-list-hidden",
 "-C", "llvm-args=--disable-mips-delay-filler", #we dont have delayslots so full em with nops
 
 #"-C", "lto=yes", #optimize at link time
