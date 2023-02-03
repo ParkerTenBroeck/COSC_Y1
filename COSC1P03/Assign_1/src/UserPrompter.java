@@ -71,16 +71,16 @@ public class UserPrompter {
      * Prints the help message explaining and showing how to use our GUI and analyzer
      */
     private void printHelp(){
-        this.formPrintln("Arguments should be comma separated and in the format *{IDENT} {ASSOCIATED_DATA}");
+        this.formPrintln("Arguments should be comma separated and in the format -[IDENT][ASSOCIATED_DATA]*");
         this.formPrintln("-e            -> exit program immediately, all other arguments typed in will be ignored if this is encountered");
         this.formPrintln("-h            -> print help, (these messages) (no analysis will be done if this argument is passed)");
-        this.formPrintln("-f {FILE}     -> set the filepath of the input file to by analyzed, leave blank to use the default value: \"" + DEFAULT_INPUT_FILE + "\"");
+        this.formPrintln("-f            -> open a file selector prompt for the input file");
         this.formPrintln("-o {FILE}     -> set the filepath of the output file for the results of the analysis, leave blank to use the default value: \"" + DEFAULT_OUTPUT_FILE + "\"");
         this.formPrintln("-c {INTEGER}  -> set the max word length graph cutoff. leaving blank will let the graph displayer decide what number is best");
         this.formPrintln("EXAMPLES: ");
-        this.formPrintln("-e                    -> exits program");
+        this.formPrintln("-f                    -> prompts the user to select the file to be analyzed");
         this.formPrintln("-h                    -> print this message");
-        this.formPrintln("-c 12,-f text.txt     -> analyzes \"text.txt\" and cuts off the word length graph at 12 bars");
+        this.formPrintln("-c 12,-f              -> prompts the user to select the file to be analyzed and cuts off the word length graph at 12 bars");
         this.formPrintln("                      -> if left blank all default options are used when analyzing");
         this.formPrintln("\n");
     }
@@ -146,17 +146,8 @@ public class UserPrompter {
                     // exit the blocking loop
                     break blockingLoop;
                 }else if (arg.startsWith("-f")){
-                    // remove the leading "-f" and trim the result
-                    var tmp = arg.substring(2).trim();
-                    // test to make sure that our filename isn't empty or blank
-                    if (tmp.isBlank()){
-                        // if so print an error and ask for user input again
-                        this.formPrintln("Input file cannot have a blank name");
-                        continue blockingLoop;
-                    }else{
-                        // otherwise set the input file to this argument
-                        inputFile = tmp;
-                    }
+                    // remove the default value for our input file
+                    inputFile = null;
                 }else if (arg.startsWith("-o")){
                     // remove the leading "-o" and trim the result
                     var tmp = arg.substring(2).trim();
@@ -210,7 +201,14 @@ public class UserPrompter {
      */
     private void analyzeFromOptions(String inputFile, String outputFile, Integer rowCutoff){
         // open our essay
-        var file = new ASCIIDataFile(inputFile);
+        ASCIIDataFile file;
+        // if a provided file path isn't given prompt the user with a file selector
+        if (inputFile != null){
+            file = new ASCIIDataFile(inputFile);
+        }else {
+            file = new ASCIIDataFile();
+            inputFile = file.getFile().getPath();
+        }
 
         // create a WordTokenizer from the opened file.
         // crate an instance of WordFrequencyTabulator and old.WordLengthTabulator
