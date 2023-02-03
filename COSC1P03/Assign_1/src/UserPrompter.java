@@ -249,6 +249,7 @@ public class UserPrompter {
      * Close our GUI
      */
     public void close(){
+        form.hide();
         form.close();
     }
 }
