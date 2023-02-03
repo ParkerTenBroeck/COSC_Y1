@@ -1,0 +1,14 @@
+package T1DrJava;
+
+
+public class ArraysExample {
+  private int[] a;//declared an array called a which stores ints. 
+  public ArraysExample() { 
+    a = new int[2];//here is how we initialize it to hold two elements.
+  }
+  
+  public static void main(String[] args) { 
+    ArraysExample ae = new ArraysExample();
+  }
+  
+}

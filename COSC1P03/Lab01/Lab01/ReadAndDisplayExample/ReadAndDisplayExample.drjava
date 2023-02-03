@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<drjava version="drjava-20190813-220051">
+  <project autorefresh="false" build="" root="" work="">
+    <createjar file=""/>
+    <source>
+      <file active="true" name="ASCIIDisplayerTest.java" package="ReadAndDisplayExample" timestamp="17-Jan-2021 20:00:17">
+        <select from="313" to="313"/>
+        <scroll column="0" row="0"/>
+      </file>
+      <file name="ASCIIDataFileTest.java" package="ReadAndDisplayExample" timestamp="17-Jan-2021 20:01:15">
+        <select from="313" to="313"/>
+        <scroll column="0" row="0"/>
+      </file>
+    </source>
+    <included/>
+    <excluded/>
+    <collapsed/>
+    <classpath/>
+    <breakpoints/>
+    <watches/>
+    <bookmarks/>
+    <preferences/>
+  </project>
+</drjava>

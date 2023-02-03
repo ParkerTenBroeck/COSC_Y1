@@ -1,0 +1,5 @@
+Zeroth	0	7.00
+First	1	7.25
+Second	2	7.50
+Third	3	7.75
+Fourth	4	8.00
