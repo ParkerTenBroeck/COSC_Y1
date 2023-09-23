@@ -1,0 +1,26 @@
+﻿Start at 4,1.
+File transcription complete!
+
+Initial State:
+OOOOOOOOO
+OSSSSSOKO
+OSOOSSOOO
+OSOSSSSSO
+OMOKOOSOO
+OOOOOOOOO
+
+Final Layout:
+OOOOOOOOO
+O22223OKO
+O1OOX3OOO
+O1O344XXO
+O1OKOOXOO
+OOOOOOOOO
+Findeth yon keys: U U U R R R R D D L L D 
+
+
+
+it went (ignoring multiples of the same direction), up, right, down, ( right, ((right) backtrack, down) backtrack) backtrack, left, (up) backtrack, left, down. 
+
+
+

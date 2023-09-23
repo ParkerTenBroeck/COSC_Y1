@@ -1,0 +1,15 @@
+For a pretty decent general purpose dough (whether for bread, pizza, whatever), you can't go wrong with a standard 70% hydration, using bread flour.
+For those not familiar, 'hydrations' (in the context of bread-baking) uses "baker's percents". Dontcha just love it when people explain one esoteric term by using another? It's actually really simple:
+Suppose I want to make a "70% hydration bread". First, I pick the amount of flour. I'd probably go with 350 to 500g for a lot of purposes, but to demonstrate we'll say exactly 100g of flour.
+At 70% hydration, that means I use 70% *of 100g*, or 70g of water (which you can take to mean 70mL if you prefer).
+You'll notice this means the dough doesn't end up being 70% water or anything.
+
+And everything else is also defined in relation to that 100g of flour. So I'll commonly use 2% yeast, meaning 2g in this case. And 2% salt, so 2g (which, side note, is a LOT if you're trying to reduce your sodium!).
+So far, we've been talking about 'lean dough's: those with no other eggs, sugar, dairy, etc. added. If you do add those, it's common to similarly express their ratios in baker's percents (though for eggs, you'll probably either just go by 'number of eggs/yolks', or tweak the other amounts to ensure it works out).
+
+But anyhoo, why use a baker's percentage? Because it scales! Easily! If you want to feed more people, the math is simple! If you want to tweak things, there's a common reference point (for example, changing the hydration is common).
+It also makes it relatively easy to accommodate fixed values. e.g. if you aren't using a canister of yeast, those little packets tend to be 7g each. A lil' bit of algebra will easily tell you that 7g is 2% of 350g, so if you're looking to use one packet, that's a pretty good amount of flour to choose! (It's also simply a decent amount in general, for several purposes)
+That said, on the subject of sodium? Don't dismiss it entirely. Depending on whom you ask, people are recommended to limit sodium intake to either 2000 or 2500mg of sodium per day (obviously those with high blood pressure should aim for even lower). Salt is about 40% sodium, so 7 grams of salt means... 2800mg, or more than a full day's allotment. Of course, if you're making something like a pizza, and half of it goes to someone else, or is leftovers for the next day, then you're doing a lot better (but remember the sodium in the sauce, and the toppings, and the...).
+Then again, that sort of thing is mostly about lifestyle, and pizza is good for the soul. Especially with a homemade crust.
+
+...dangit. Now I want pizza.

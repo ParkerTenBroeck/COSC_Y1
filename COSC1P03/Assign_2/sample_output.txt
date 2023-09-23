@@ -1,0 +1,170 @@
+Misc:
+ h: Prints this message~!
+ r: Prompts user to select a file to load again (clearing the old contents)
+ s: Prompts the user to select a file for the current work to be saved to
+ q: Exits this program
+
+Printing Text:
+ c: Prints the currently selected line
+ p: Prints the contents of the work
+
+Cursor Movement:
+ t: Seeks to the first line of the file
+ b: Seeks off the end of the file (after last line)
+ u: Seeks one line upwards
+ d: Seeks one line downwards
+ ?[text]: Moves the cursor to the first line it finds containing [text] (not case sensitive)
+
+Clipboard Manipulation:
+ x: Cuts the line the cursor is currently on
+ v: Pastes the line currently in the clipboard at the cursors current position
+
+Line Manipulation:
+ i[text]: Inserts a new line with contents [text] at the cursors current position
+ e[text]: Replaces the cursors currently highlighted line with [text]
+
+p
+================
+>Initially first
+]The best text for you!
+]But don't tell them?
+]Okay, I'm done now!
+================
+?the
+Found match! line: 11
+p
+================
+]Initially first
+>The best text for you!
+]But don't tell them?
+]Okay, I'm done now!
+================
+d
+d
+?the
+Unable to find: "the"
+p
+================
+]Initially first
+]The best text for you!
+]But don't tell them?
+]Okay, I'm done now!
+>
+================
+iActually, one more line!
+c
+Current: "Actually, one more line!"
+?the
+Unable to find: "the"
+p
+================
+]Initially first
+]The best text for you!
+]But don't tell them?
+]Okay, I'm done now!
+]Actually, one more line!
+>
+================
+t
+e
+?
+Found match! line: 01
+p
+================
+>
+]The best text for you!
+]But don't tell them?
+]Okay, I'm done now!
+]Actually, one more line!
+================
+eStill the first
+[
+Unknown command: [
+type "h" for help
+p
+================
+>Still the first
+]The best text for you!
+]But don't tell them?
+]Okay, I'm done now!
+]Actually, one more line!
+================
+iWhat's before the first?
+p
+================
+>What's before the first?
+]Still the first
+]The best text for you!
+]But don't tell them?
+]Okay, I'm done now!
+]Actually, one more line!
+================
+i
+p
+================
+>
+]What's before the first?
+]Still the first
+]The best text for you!
+]But don't tell them?
+]Okay, I'm done now!
+]Actually, one more line!
+================
+b
+p
+================
+]
+]What's before the first?
+]Still the first
+]The best text for you!
+]But don't tell them?
+]Okay, I'm done now!
+]Actually, one more line!
+>
+================
+u
+e
+p
+================
+]
+]What's before the first?
+]Still the first
+]The best text for you!
+]But don't tell them?
+]Okay, I'm done now!
+>
+================
+u
+x
+u
+u
+v
+v
+p
+================
+]
+]What's before the first?
+]Still the first
+>Okay, I'm done now!
+]Okay, I'm done now!
+]The best text for you!
+]But don't tell them?
+]
+================
+s
+t
+iBefore the before the first!
+p
+================
+>Before the before the first!
+]
+]What's before the first?
+]Still the first
+]Okay, I'm done now!
+]Okay, I'm done now!
+]The best text for you!
+]But don't tell them?
+]
+================
+q
+bye :3

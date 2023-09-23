@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="SmartDashboard-2023.2.1-linuxx64">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/wpilib/2023/tools/artifacts/SmartDashboard-2023.2.1-linuxx64.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -4,11 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c06d3531-f963-4ae4-9944-f7e80f770341" name="Changes" comment="" />
+    <list default="true" id="c06d3531-f963-4ae4-9944-f7e80f770341" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../Assign_2/src/LinkedList.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Assign_1/Assign_1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../Assign_1/Assign_1.iml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -22,7 +28,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "/home/may/Documents/GitHub/Legend-of-Xor",
+    "last_opened_file_path": "/home/may/Documents/GitHub/COSC1P02_LAB/COSC1P03/Sandbox",
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.2"
